@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TinySquish — Offline Image Compressor</title>
+
+<!-- Prevent caching so saved pages break -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- This is just a shell — real content is injected by loader.js -->
+<div id="app-root">
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-logo">🐼</div>
+    <h1>TinySquish</h1>
+    <p>Loading compressor engine...</p>
+    <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+  </div>
+</div>
+
+<noscript>
+  <div style="text-align:center;padding:4rem 2rem;font-family:sans-serif;">
+    <h1>🐼 TinySquish</h1>
+    <p style="margin-top:1rem;color:#636E72;">JavaScript is required to run this application.</p>
+  </div>
+</noscript>
+
+<!-- Protection: integrity check + dynamic load -->
+<script src="loader.js"></script>
+
+</body>
+</html>
