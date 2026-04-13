@@ -679,8 +679,8 @@ window.__initTinySquish = function() {
     if (fo.status === 'error') html += '<span class="file-status error">Error</span>';
     if (fo.status === 'pending') html += '<span class="file-status">Ready</span>';
     html += '</div></div><div class="file-actions">';
-    if (fo.status === 'done') html += '<button class="file-btn compare-btn" data-id="' + fo.id + '" title="Compare">\uD83D\uDD0D</button><button class="file-btn download-btn" data-id="' + fo.id + '" title="Download">\u2B07\uFE0F</button>';
-    html += '<button class="file-btn delete remove-btn" data-id="' + fo.id + '" title="Remove">\u2715</button></div>';
+    if (fo.status === 'done') html += '<button class="file-btn compare-btn" data-id="' + fo.id + '" title="Compare" aria-label="Compare original and compressed">\uD83D\uDD0D</button><button class="file-btn download-btn" data-id="' + fo.id + '" title="Download" aria-label="Download compressed image">\u2B07\uFE0F</button>';
+    html += '<button class="file-btn delete remove-btn" data-id="' + fo.id + '" title="Remove" aria-label="Remove image">\u2715</button></div>';
     if (fo.status === 'compressing') html += '<div class="file-progress" style="width:60%"></div>';
     if (fo.status === 'done') html += '<div class="file-progress" style="width:100%;background:var(--success);"></div>';
     el.innerHTML = html;
