@@ -145,18 +145,29 @@
       return;
     }
 
-    // Dynamically load the core engine
-    var s = document.createElement('script');
-    s.src = 'app.js?v=' + Date.now(); // Cache bust
-    s.onload = function() {
-      if (typeof window.__initTinySquish === 'function') {
-        window.__initTinySquish();
-      }
-    };
-    s.onerror = function() {
+    // Load dependencies sequentially: pako → UPNG → app.js
+    // UPNG.js captures window.pako at execution time, so pako must load first.
+    function showError() {
       document.getElementById('app-root').innerHTML = '<div style="text-align:center;padding:4rem;font-family:sans-serif;"><h1>🐼 TinySquish</h1><p style="color:#E17055;margin-top:1rem;">Failed to load application engine. Please refresh.</p></div>';
-    };
-    document.body.appendChild(s);
+    }
+
+    function loadScript(src, onDone) {
+      var s = document.createElement('script');
+      s.src = src + '?v=' + Date.now();
+      s.onload = onDone;
+      s.onerror = showError;
+      document.body.appendChild(s);
+    }
+
+    loadScript('pako.min.js', function() {
+      loadScript('UPNG.js', function() {
+        loadScript('app.js', function() {
+          if (typeof window.__initTinySquish === 'function') {
+            window.__initTinySquish();
+          }
+        });
+      });
+    });
   }
 
   // Wait for loading animation, then inject

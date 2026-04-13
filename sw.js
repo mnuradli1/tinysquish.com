@@ -3,7 +3,7 @@
  * Purpose: Intercept requests to prevent easy offline saving & add cache control
  */
 
-const CACHE_NAME = 'tinysquish-v1';
+const CACHE_NAME = 'tinysquish-v4';
 const ORIGIN_CHECK = true;
 
 // Install — cache core assets
@@ -15,6 +15,8 @@ self.addEventListener('install', function(event) {
         './index.html',
         './style.css',
         './loader.js',
+        './pako.min.js',
+        './UPNG.js',
         './app.js'
       ]);
     })

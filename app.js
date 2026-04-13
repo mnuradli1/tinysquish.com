@@ -15,31 +15,31 @@ window.__initTinySquish = function() {
   root.innerHTML = '';
 
   root.innerHTML = [
-    '<header class="header"><div class="logo">',
-    '<h1><span class="logo-icon">\uD83D\uDC3C</span> TinySquish</h1>',
-    '<p>Smart image compression \u2014 100% in your browser</p>',
-    '</div></header>',
+    '<header class="header">',
+    '<div class="brand"><span class="brand-icon">\uD83D\uDC3C</span><span class="brand-name">TinySquish</span></div>',
+    '<p class="brand-tagline">Compress images in your browser \u2014 nothing is uploaded</p>',
+    '</header>',
     '<main class="container">',
     '<div class="drop-zone" id="dropZone">',
-    '<span class="drop-zone-icon">\uD83D\uDCC1</span>',
-    '<h2>Drop your images here</h2>',
-    '<p>or click to browse files</p>',
+    '<span class="drop-zone-icon">\uD83D\uDDBC\uFE0F</span>',
+    '<h2>Drop images here</h2>',
+    '<p>or choose from your device</p>',
     '<div class="browse-buttons">',
     '<button class="browse-btn" id="btnChooseFiles">Choose Files</button>',
-    '<button class="browse-btn browse-btn-folder" id="btnChooseFolder">\uD83D\uDCC2 Choose Folder</button>',
+    '<button class="browse-btn browse-btn-folder" id="btnChooseFolder">\uD83D\uDCC2 Folder</button>',
     '</div>',
-    '<p class="formats-hint">Supports PNG, JPEG, WebP \u2014 Drop files or entire folders \u2014 Up to 20 images</p>',
+    '<p class="formats-hint">PNG, JPEG, WebP \u2022 Up to 20 images</p>',
     '<input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" multiple>',
     '<input type="file" id="folderInput" webkitdirectory multiple>',
     '</div>',
     '<div class="options-bar" id="optionsBar">',
     '<div class="option-group">',
-    '<label>Quality:</label>',
+    '<label>Quality</label>',
     '<input type="range" class="quality-slider" id="qualitySlider" min="10" max="95" value="75">',
     '<span class="quality-value" id="qualityValue">75%</span>',
     '</div>',
     '<div class="option-group">',
-    '<label>Convert to:</label>',
+    '<label>Format</label>',
     '<select class="format-select" id="formatSelect">',
     '<option value="original">Keep Original</option>',
     '<option value="image/jpeg">JPEG</option>',
@@ -48,9 +48,44 @@ window.__initTinySquish = function() {
     '</select>',
     '</div>',
     '<div class="action-buttons">',
-    '<button class="btn btn-primary" id="compressAllBtn">\uD83D\uDDDC\uFE0F Compress All</button>',
-    '<button class="btn btn-success" id="downloadAllBtn" disabled>\uD83D\uDCE6 Download ZIP</button>',
-    '<button class="btn btn-danger" id="clearAllBtn">\u2715 Clear</button>',
+    '<button class="btn btn-primary" id="compressAllBtn">Compress All</button>',
+    '<button class="btn btn-success" id="downloadAllBtn" disabled>Download ZIP</button>',
+    '<button class="btn btn-danger" id="clearAllBtn">Clear</button>',
+    '</div>',
+    '</div>',
+    '<div class="resize-panel" id="resizePanel">',
+    '<div class="resize-header">',
+    '<div class="option-group">',
+    '<label>Resize</label>',
+    '<select class="format-select" id="resizeMode">',
+    '<option value="off">Off</option>',
+    '<option value="percent">By Percentage</option>',
+    '<option value="dimensions">By Dimensions</option>',
+    '</select>',
+    '</div>',
+    '<span class="resize-preview" id="resizePreview"></span>',
+    '</div>',
+    '<div class="resize-controls" id="resizeControls">',
+    '<div class="resize-percent-controls" id="resizePercentControls">',
+    '<div class="option-group">',
+    '<label>Scale</label>',
+    '<input type="range" class="quality-slider" id="resizePercent" min="10" max="200" value="50">',
+    '<span class="quality-value" id="resizePercentValue">50%</span>',
+    '</div>',
+    '</div>',
+    '<div class="resize-dim-controls" id="resizeDimControls" style="display:none">',
+    '<div class="option-group">',
+    '<label>W</label>',
+    '<input type="number" class="dim-input" id="resizeWidth" min="1" max="99999" placeholder="Width">',
+    '</div>',
+    '<div class="option-group">',
+    '<label>H</label>',
+    '<input type="number" class="dim-input" id="resizeHeight" min="1" max="99999" placeholder="Height">',
+    '</div>',
+    '<div class="option-group">',
+    '<button class="btn-lock" id="aspectLockBtn" title="Lock aspect ratio">\uD83D\uDD12</button>',
+    '</div>',
+    '</div>',
     '</div>',
     '</div>',
     '<div class="file-list" id="fileList"></div>',
@@ -67,7 +102,7 @@ window.__initTinySquish = function() {
     '<div class="modal-overlay" id="comparisonModal">',
     '<div class="modal">',
     '<div class="modal-header">',
-    '<h3 id="modalTitle">Before / After Comparison</h3>',
+    '<h3 id="modalTitle">Before / After</h3>',
     '<button class="modal-close" id="modalCloseBtn">\u2715</button>',
     '</div>',
     '<div class="comparison-container" id="comparisonContainer">',
@@ -84,17 +119,27 @@ window.__initTinySquish = function() {
     '</div>',
     '</div>',
     '<div class="toast-container" id="toastContainer"></div>',
-    '<footer class="footer"><p>TinySquish \u2014 All processing happens locally in your browser. No data is uploaded.</p></footer>',
+    '<footer class="footer"><p>\uD83D\uDC3C TinySquish \u2014 100% local processing, zero uploads</p></footer>',
     '<div class="devtools-warning" id="devtoolsWarning">',
-    '<div style="font-size:3rem">\uD83D\uDEE1\uFE0F</div>',
+    '<div style="font-size:2.5rem">\uD83D\uDEE1\uFE0F</div>',
     '<h2>Developer Tools Detected</h2>',
     '<p>Please close Developer Tools to continue using TinySquish.</p>',
     '</div>',
-    '<div class="watermark">TINYSQUISH \u00B7 PROTECTED</div>'
+    '<div class="watermark">TINYSQUISH</div>'
   ].join('');
 
   // ===== STATE =====
   var state = { files: [], nextId: 0 };
+
+  // ===== RESIZE STATE =====
+  var resizeState = {
+    mode: 'off',        // 'off' | 'percent' | 'dimensions'
+    percent: 50,
+    width: 0,
+    height: 0,
+    aspectLocked: true,
+    aspectRatio: 1
+  };
 
   // ===== UTILITY =====
   function formatSize(bytes) {
@@ -192,7 +237,8 @@ window.__initTinySquish = function() {
   });
 
   dropZone.addEventListener('click', function(e) {
-    if (e.target.tagName !== 'BUTTON') fileInput.click();
+    if (e.target.tagName === 'INPUT' || e.target.closest('button')) return;
+    fileInput.click();
   });
 
   fileInput.addEventListener('change', function() {
@@ -246,6 +292,71 @@ window.__initTinySquish = function() {
     toast('All files cleared', 'info');
   }
 
+  // ===== RESIZE ENGINE =====
+  function calcResizeDims(origW, origH) {
+    if (resizeState.mode === 'percent') {
+      var scale = resizeState.percent / 100;
+      return { w: Math.max(1, Math.round(origW * scale)), h: Math.max(1, Math.round(origH * scale)) };
+    }
+    if (resizeState.mode === 'dimensions') {
+      return { w: Math.max(1, resizeState.width || origW), h: Math.max(1, resizeState.height || origH) };
+    }
+    return { w: origW, h: origH };
+  }
+
+  function resizeCanvas(img, targetW, targetH) {
+    var currentW = img.naturalWidth || img.width;
+    var currentH = img.naturalHeight || img.height;
+
+    // Start with source image on a canvas
+    var src = document.createElement('canvas');
+    src.width = currentW;
+    src.height = currentH;
+    var srcCtx = src.getContext('2d');
+    srcCtx.drawImage(img, 0, 0);
+
+    // Step down in halves for quality (>2x downscale)
+    while (currentW / 2 >= targetW && currentH / 2 >= targetH) {
+      var halfW = Math.round(currentW / 2);
+      var halfH = Math.round(currentH / 2);
+      var tmp = document.createElement('canvas');
+      tmp.width = halfW;
+      tmp.height = halfH;
+      var tmpCtx = tmp.getContext('2d');
+      tmpCtx.imageSmoothingEnabled = true;
+      tmpCtx.imageSmoothingQuality = 'high';
+      tmpCtx.drawImage(src, 0, 0, halfW, halfH);
+      src = tmp;
+      currentW = halfW;
+      currentH = halfH;
+    }
+
+    // Final step to exact target
+    var final_ = document.createElement('canvas');
+    final_.width = targetW;
+    final_.height = targetH;
+    var finalCtx = final_.getContext('2d');
+    finalCtx.imageSmoothingEnabled = true;
+    finalCtx.imageSmoothingQuality = 'high';
+    finalCtx.drawImage(src, 0, 0, targetW, targetH);
+    return final_;
+  }
+
+  function updateResizePreview() {
+    var preview = document.getElementById('resizePreview');
+    if (resizeState.mode === 'off' || !state.files.length) {
+      preview.textContent = '';
+      return;
+    }
+    var fo = state.files[0];
+    if (!fo._origW) {
+      preview.textContent = '';
+      return;
+    }
+    var dims = calcResizeDims(fo._origW, fo._origH);
+    preview.textContent = fo._origW + '\u00D7' + fo._origH + ' \u2192 ' + dims.w + '\u00D7' + dims.h;
+  }
+
   // ===== COMPRESSION ENGINE =====
   function loadImage(src) {
     return new Promise(function(resolve, reject) {
@@ -256,30 +367,6 @@ window.__initTinySquish = function() {
     });
   }
 
-  function quantize(imageData, quality) {
-    var data = imageData.data;
-    var shift = quality >= 0.5 ? 1 : quality >= 0.25 ? 2 : quality >= 0.125 ? 3 : 4;
-    var w = imageData.width, h = imageData.height;
-    for (var y = 0; y < h; y++) {
-      for (var x = 0; x < w; x++) {
-        var i = (y * w + x) * 4;
-        if (data[i + 3] === 0) continue;
-        for (var c = 0; c < 3; c++) {
-          var oldVal = data[i + c];
-          var newVal = (oldVal >> shift) << shift;
-          data[i + c] = newVal;
-          var error = oldVal - newVal;
-          if (x + 1 < w) data[i + 4 + c] = Math.min(255, Math.max(0, data[i + 4 + c] + error * 7 / 16));
-          if (y + 1 < h) {
-            if (x > 0) data[((y+1)*w+x-1)*4+c] = Math.min(255, Math.max(0, data[((y+1)*w+x-1)*4+c] + error * 3 / 16));
-            data[((y+1)*w+x)*4+c] = Math.min(255, Math.max(0, data[((y+1)*w+x)*4+c] + error * 5 / 16));
-            if (x + 1 < w) data[((y+1)*w+x+1)*4+c] = Math.min(255, Math.max(0, data[((y+1)*w+x+1)*4+c] + error / 16));
-          }
-        }
-      }
-    }
-  }
-
   async function compressImage(fileObj) {
     var quality = parseInt(document.getElementById('qualitySlider').value) / 100;
     var targetFormat = document.getElementById('formatSelect').value;
@@ -288,29 +375,90 @@ window.__initTinySquish = function() {
     updateFileItem(fileObj);
     try {
       var img = await loadImage(fileObj.originalUrl);
+      var origW = img.naturalWidth, origH = img.naturalHeight;
+
+      // Store original dimensions for display and aspect ratio
+      fileObj._origW = origW;
+      fileObj._origH = origH;
+
+      // Calculate resize dimensions
+      var w = origW, h = origH;
+      var resized = false;
+      if (resizeState.mode !== 'off') {
+        resizeState.aspectRatio = origW / origH;
+        var dims = calcResizeDims(origW, origH);
+        w = dims.w;
+        h = dims.h;
+        if (w !== origW || h !== origH) resized = true;
+      }
+      fileObj._outW = w;
+      fileObj._outH = h;
+
+      // Create canvas — use multi-step resize if dimensions changed
       var canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
+      canvas.width = w;
+      canvas.height = h;
       var ctx = canvas.getContext('2d');
-      if (outputMime === 'image/png') { ctx.clearRect(0, 0, canvas.width, canvas.height); }
-      else { ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
-      ctx.drawImage(img, 0, 0);
-      if (outputMime === 'image/png') {
-        var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        quantize(imageData, quality);
-        ctx.putImageData(imageData, 0, 0);
-      }
-      var blob = await new Promise(function(resolve, reject) {
-        canvas.toBlob(function(b) { b ? resolve(b) : reject(new Error('fail')); }, outputMime, outputMime === 'image/png' ? undefined : quality);
-      });
-      if (blob.size >= fileObj.originalSize && targetFormat === 'original') {
-        var blob2 = await new Promise(function(r) {
-          canvas.toBlob(function(b) { r(b); }, outputMime, Math.max(0.1, quality - 0.15));
-        });
-        fileObj.compressedBlob = (blob2 && blob2.size < fileObj.originalSize) ? blob2 : blob;
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      var blob;
+
+      if (outputMime === 'image/png' && typeof UPNG !== 'undefined') {
+        // === PNG: UPNG.js indexed-color quantization (TinyPNG-like) ===
+        ctx.clearRect(0, 0, w, h);
+        if (resized) {
+          var rc = resizeCanvas(img, w, h);
+          ctx.drawImage(rc, 0, 0);
+        } else {
+          ctx.drawImage(img, 0, 0);
+        }
+        var rgba = ctx.getImageData(0, 0, w, h).data.buffer;
+        // Map quality slider to palette color count:
+        // 95% → 256, 75% → 256, 50% → 128, 25% → 64, 10% → 32
+        var colors = quality >= 0.65 ? 256 : Math.max(16, Math.round(256 * (quality / 0.65)));
+        var pngData = UPNG.encode([rgba], w, h, colors);
+        blob = new Blob([pngData], { type: 'image/png' });
+
+        // If still bigger, try with fewer colors
+        if (blob.size >= fileObj.originalSize) {
+          var fewer = Math.max(16, Math.round(colors * 0.5));
+          var pngData2 = UPNG.encode([rgba], w, h, fewer);
+          var blob2 = new Blob([pngData2], { type: 'image/png' });
+          blob = blob2.size < blob.size ? blob2 : blob;
+        }
       } else {
-        fileObj.compressedBlob = blob;
+        // === JPEG / WebP (or PNG fallback without UPNG) ===
+        if (outputMime === 'image/jpeg') {
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, w, h);
+        } else {
+          ctx.clearRect(0, 0, w, h);
+        }
+        if (resized) {
+          var rc = resizeCanvas(img, w, h);
+          ctx.drawImage(rc, 0, 0);
+        } else {
+          ctx.drawImage(img, 0, 0);
+        }
+        blob = await new Promise(function(resolve, reject) {
+          canvas.toBlob(function(b) { b ? resolve(b) : reject(new Error('fail')); }, outputMime, quality);
+        });
+
+        // If bigger, retry at lower quality
+        if (blob.size >= fileObj.originalSize) {
+          var blob2 = await new Promise(function(r) {
+            canvas.toBlob(function(b) { r(b); }, outputMime, Math.max(0.1, quality - 0.15));
+          });
+          if (blob2 && blob2.size < blob.size) blob = blob2;
+        }
       }
+
+      // Final safety: never return a file bigger than the original (skip if resized)
+      if (!resized && blob.size >= fileObj.originalSize && targetFormat === 'original') {
+        blob = fileObj.file;
+      }
+
+      fileObj.compressedBlob = blob;
       if (fileObj.compressedUrl) URL.revokeObjectURL(fileObj.compressedUrl);
       fileObj.compressedUrl = URL.createObjectURL(fileObj.compressedBlob);
       fileObj.compressedSize = fileObj.compressedBlob.size;
@@ -451,11 +599,62 @@ window.__initTinySquish = function() {
     document.getElementById('qualityValue').textContent = e.target.value + '%';
   });
 
+  // ===== RESIZE CONTROLS =====
+  var resizeModeSelect = document.getElementById('resizeMode');
+  var resizePercentSlider = document.getElementById('resizePercent');
+  var resizePercentValueEl = document.getElementById('resizePercentValue');
+  var resizeWidthInput = document.getElementById('resizeWidth');
+  var resizeHeightInput = document.getElementById('resizeHeight');
+  var aspectLockBtn = document.getElementById('aspectLockBtn');
+  var resizePercentControls = document.getElementById('resizePercentControls');
+  var resizeDimControls = document.getElementById('resizeDimControls');
+  var resizeControlsEl = document.getElementById('resizeControls');
+
+  resizeModeSelect.addEventListener('change', function() {
+    resizeState.mode = this.value;
+    resizeControlsEl.style.display = this.value === 'off' ? 'none' : '';
+    resizePercentControls.style.display = this.value === 'percent' ? '' : 'none';
+    resizeDimControls.style.display = this.value === 'dimensions' ? '' : 'none';
+    updateResizePreview();
+  });
+
+  resizePercentSlider.addEventListener('input', function() {
+    resizeState.percent = parseInt(this.value);
+    resizePercentValueEl.textContent = this.value + '%';
+    updateResizePreview();
+  });
+
+  resizeWidthInput.addEventListener('input', function() {
+    resizeState.width = parseInt(this.value) || 0;
+    if (resizeState.aspectLocked && resizeState.aspectRatio > 0 && resizeState.width > 0) {
+      resizeState.height = Math.max(1, Math.round(resizeState.width / resizeState.aspectRatio));
+      resizeHeightInput.value = resizeState.height;
+    }
+    updateResizePreview();
+  });
+
+  resizeHeightInput.addEventListener('input', function() {
+    resizeState.height = parseInt(this.value) || 0;
+    if (resizeState.aspectLocked && resizeState.aspectRatio > 0 && resizeState.height > 0) {
+      resizeState.width = Math.max(1, Math.round(resizeState.height * resizeState.aspectRatio));
+      resizeWidthInput.value = resizeState.width;
+    }
+    updateResizePreview();
+  });
+
+  aspectLockBtn.addEventListener('click', function() {
+    resizeState.aspectLocked = !resizeState.aspectLocked;
+    this.textContent = resizeState.aspectLocked ? '\uD83D\uDD12' : '\uD83D\uDD13';
+    this.title = resizeState.aspectLocked ? 'Lock aspect ratio' : 'Unlock aspect ratio';
+  });
+
   // ===== UI RENDERING =====
   function updateUI() {
     var optionsBar = document.getElementById('optionsBar');
+    var resizePanel = document.getElementById('resizePanel');
     var fileList = document.getElementById('fileList');
     state.files.length > 0 ? optionsBar.classList.add('visible') : optionsBar.classList.remove('visible');
+    state.files.length > 0 ? resizePanel.classList.add('visible') : resizePanel.classList.remove('visible');
     if (!state.files.length) document.getElementById('summaryBar').classList.remove('visible');
     fileList.innerHTML = '';
     state.files.forEach(function(f) { fileList.appendChild(createFileEl(f)); });
@@ -472,6 +671,9 @@ window.__initTinySquish = function() {
     var html = '<img class="file-thumb" src="' + fo.originalUrl + '" alt="' + fo.file.name + '">';
     html += '<div class="file-info"><div class="file-name">' + fo.file.name + '</div><div class="file-meta">';
     html += '<span class="file-size-original">' + formatSize(fo.originalSize) + '</span>';
+    if (fo._origW && fo._outW && (fo._outW !== fo._origW || fo._outH !== fo._origH)) {
+      html += '<span class="file-dims">' + fo._origW + '\u00D7' + fo._origH + ' \u2192 ' + fo._outW + '\u00D7' + fo._outH + '</span>';
+    }
     if (fo.status === 'done') html += ' <span>\u2192</span> <span class="file-size-compressed">' + formatSize(fo.compressedSize) + '</span> <span class="file-savings ' + sc + '">-' + savings + '%</span>';
     if (fo.status === 'compressing') html += '<span class="file-status compressing"><span class="spinner"></span> Compressing...</span>';
     if (fo.status === 'error') html += '<span class="file-status error">Error</span>';
