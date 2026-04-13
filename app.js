@@ -83,7 +83,7 @@ window.__initTinySquish = function() {
     '<input type="number" class="dim-input" id="resizeHeight" min="1" max="99999" placeholder="Height">',
     '</div>',
     '<div class="option-group">',
-    '<button class="btn-lock" id="aspectLockBtn" title="Lock aspect ratio">\uD83D\uDD12</button>',
+    '<button class="btn-lock" id="aspectLockBtn" title="Lock aspect ratio" aria-label="Lock aspect ratio">\uD83D\uDD12</button>',
     '</div>',
     '</div>',
     '</div>',
@@ -267,6 +267,27 @@ window.__initTinySquish = function() {
         compressedBlob: null, compressedUrl: null,
         originalSize: file.size, compressedSize: 0, status: 'pending'
       });
+    });
+    // Preload dimensions for all added files
+    toAdd.forEach(function(file) {
+      var fo = state.files[state.files.length - toAdd.length + toAdd.indexOf(file)];
+      var img = new Image();
+      img.onload = function() {
+        fo._origW = img.naturalWidth;
+        fo._origH = img.naturalHeight;
+        // Set aspect ratio from first file if not set yet
+        if (state.files.indexOf(fo) === 0) {
+          resizeState.aspectRatio = fo._origW / fo._origH;
+          if (resizeState.mode === 'dimensions' && !resizeState.width && !resizeState.height) {
+            resizeState.width = fo._origW;
+            resizeState.height = fo._origH;
+            document.getElementById('resizeWidth').value = fo._origW;
+            document.getElementById('resizeHeight').value = fo._origH;
+          }
+        }
+        updateResizePreview();
+      };
+      img.src = fo.originalUrl;
     });
     updateUI();
     toast('Added ' + toAdd.length + ' image' + (toAdd.length > 1 ? 's' : ''), 'success');
@@ -612,9 +633,20 @@ window.__initTinySquish = function() {
 
   resizeModeSelect.addEventListener('change', function() {
     resizeState.mode = this.value;
-    resizeControlsEl.style.display = this.value === 'off' ? 'none' : '';
+    resizeControlsEl.style.display = this.value === 'off' ? 'none' : 'flex';
     resizePercentControls.style.display = this.value === 'percent' ? '' : 'none';
     resizeDimControls.style.display = this.value === 'dimensions' ? '' : 'none';
+    // Pre-populate dimension fields from first image
+    if (this.value === 'dimensions' && state.files.length > 0) {
+      var fo = state.files[0];
+      if (fo._origW && (!resizeState.width || !resizeState.height)) {
+        resizeState.aspectRatio = fo._origW / fo._origH;
+        resizeState.width = fo._origW;
+        resizeState.height = fo._origH;
+        resizeWidthInput.value = fo._origW;
+        resizeHeightInput.value = fo._origH;
+      }
+    }
     updateResizePreview();
   });
 
