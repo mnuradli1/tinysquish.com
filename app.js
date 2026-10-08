@@ -168,12 +168,29 @@ window.__initTinySquish = function() {
     return { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }[mime] || 'bin';
   }
 
-  function toast(msg, type) {
+  // action (optional): { label, ms, onClick, onExpire } adds a button and a longer life
+  function toast(msg, type, action) {
     var el = document.createElement('div');
+    var ms = action ? action.ms : 3000;
     el.className = 'toast ' + (type || 'info');
     el.textContent = msg;
+    if (action) {
+      el.style.animationDelay = '0s, ' + (ms - 250) / 1000 + 's';
+      var btn = document.createElement('button');
+      btn.className = 'toast-action';
+      btn.textContent = action.label;
+      btn.addEventListener('click', function() {
+        clearTimeout(timer);
+        el.remove();
+        action.onClick();
+      });
+      el.appendChild(btn);
+    }
     document.getElementById('toastContainer').appendChild(el);
-    setTimeout(function() { el.remove(); }, 3000);
+    var timer = setTimeout(function() {
+      el.remove();
+      if (action && action.onExpire) action.onExpire();
+    }, ms);
   }
 
   // ===== DROP ZONE =====
@@ -312,21 +329,37 @@ window.__initTinySquish = function() {
   function removeFile(id) {
     var idx = state.files.findIndex(function(f) { return f.id === id; });
     if (idx === -1) return;
-    var f = state.files[idx];
-    if (f.originalUrl) URL.revokeObjectURL(f.originalUrl);
-    if (f.compressedUrl) URL.revokeObjectURL(f.compressedUrl);
+    revokeFileUrls(state.files[idx]);
     state.files.splice(idx, 1);
     updateUI();
   }
 
+  function revokeFileUrls(f) {
+    if (f.originalUrl) URL.revokeObjectURL(f.originalUrl);
+    if (f.compressedUrl) URL.revokeObjectURL(f.compressedUrl);
+  }
+
+  // Clearing a whole batch is easy to hit by accident, so it's undoable for a few seconds;
+  // blob URLs stay alive until the undo window closes.
   function clearAll() {
-    state.files.forEach(function(f) {
-      if (f.originalUrl) URL.revokeObjectURL(f.originalUrl);
-      if (f.compressedUrl) URL.revokeObjectURL(f.compressedUrl);
-    });
+    var cleared = state.files;
+    if (!cleared.length) return;
+    var genAtClear = settingsGen;
     state.files = [];
     updateUI();
-    toast('All files cleared', 'info');
+    toast('Cleared ' + cleared.length + ' image' + (cleared.length === 1 ? '' : 's'), 'info', {
+      label: 'Undo',
+      ms: 6000,
+      onClick: function() {
+        var merged = cleared.concat(state.files);
+        merged.slice(20).forEach(revokeFileUrls);
+        state.files = merged.slice(0, 20);
+        updateUI();
+        // Settings changed while cleared: the restored results are stale
+        settingsGen !== genAtClear ? recompressAll() : runQueue();
+      },
+      onExpire: function() { cleared.forEach(revokeFileUrls); }
+    });
   }
 
   // ===== RESIZE ENGINE =====
@@ -532,8 +565,8 @@ window.__initTinySquish = function() {
   function recompressAll(delay) {
     clearTimeout(recompressTimer);
     recompressTimer = setTimeout(function() {
+      settingsGen++;  // also while the list is empty, so an undone Clear all knows it's stale
       if (!state.files.length) return;
-      settingsGen++;
       state.files.forEach(function(f) {
         if (f.status !== 'compressing') { f.status = 'pending'; updateFileItem(f); }
       });

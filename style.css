@@ -924,6 +924,19 @@ input[type="file"], input[type="range"], input[type="number"], select {
   max-width: 300px;
 }
 
+.toast-action {
+  margin-left: 0.85rem;
+  padding: 0.2rem 0.6rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.18);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.toast-action:hover { background: rgba(255,255,255,0.3); }
+
 .toast.success { background: var(--green); }
 .toast.error { background: var(--red); }
 .toast.info { background: var(--text); }
