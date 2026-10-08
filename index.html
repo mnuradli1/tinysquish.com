@@ -3,16 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TinySquish — Offline Image Compressor</title>
-<meta name="description" content="Compress PNG, JPEG and WebP images right in your browser. Resize, convert and batch-download as ZIP — 100% local, nothing is uploaded.">
+<title>TinySquish — Compress PNG, JPEG &amp; WebP Images Offline</title>
+<meta name="description" content="Free image compressor that runs in your browser. Shrink, resize and convert PNG, JPEG and WebP in batches. Works offline; images are never uploaded.">
+<meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://tinysquish.com/">
 <meta name="theme-color" content="#f6f5f1">
+
+<!-- Social / link previews (crawlers don't run JS, so everything lives here) -->
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="TinySquish">
 <meta property="og:url" content="https://tinysquish.com/">
-<meta property="og:title" content="TinySquish — Offline Image Compressor">
-<meta property="og:description" content="Compress PNG, JPEG and WebP images right in your browser. 100% local, nothing is uploaded.">
-<meta name="twitter:card" content="summary">
+<meta property="og:title" content="TinySquish — Compress Images Offline, Nothing Uploaded">
+<meta property="og:description" content="Compress, resize and convert PNG, JPEG and WebP right in your browser. Free, works offline, and your images never leave your device.">
+<meta property="og:image" content="https://tinysquish.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="TinySquish: compress PNG, JPEG and WebP images in your browser, nothing is uploaded">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TinySquish — Compress Images Offline, Nothing Uploaded">
+<meta name="twitter:description" content="Compress, resize and convert PNG, JPEG and WebP right in your browser. Free, works offline, and your images never leave your device.">
+<meta name="twitter:image" content="https://tinysquish.com/og-image.png">
+
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
 
 <!-- Prevent caching so saved pages break -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -21,24 +37,168 @@
 
 <link rel="preload" href="fonts/dm-sans.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
+
+<!-- Structured data: mirrors the visible content below; no ratings or reviews are claimed -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://tinysquish.com/#website",
+      "url": "https://tinysquish.com/",
+      "name": "TinySquish",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://tinysquish.com/#app",
+      "name": "TinySquish",
+      "url": "https://tinysquish.com/",
+      "description": "Free image compressor that runs entirely in the browser. Compresses, resizes and converts PNG, JPEG and WebP images in batches of up to 20, works offline, and never uploads images.",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Any (modern web browser)",
+      "browserRequirements": "Requires JavaScript",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "image": "https://tinysquish.com/og-image.png",
+      "featureList": [
+        "Compress PNG, JPEG and WebP images locally in the browser",
+        "Convert between PNG, JPEG and WebP",
+        "Lossless PNG at 90% quality and above",
+        "Resize by percentage or exact dimensions",
+        "Batch up to 20 images, including whole folders",
+        "Before/after comparison slider",
+        "Download as individual files or one ZIP",
+        "Works offline after the first visit"
+      ],
+      "isPartOf": { "@id": "https://tinysquish.com/#website" }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://tinysquish.com/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Are my images uploaded to a server?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. TinySquish compresses images locally in your browser, so the files never leave your device. The only thing the site sends is an anonymous visit count, and your IP address is never stored." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does TinySquish work offline?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. A service worker saves the app on your first visit. After that you can open tinysquish.com and compress images without an internet connection." }
+        },
+        {
+          "@type": "Question",
+          "name": "Which image formats are supported?",
+          "acceptedAnswer": { "@type": "Answer", "text": "You can add PNG, JPEG and WebP images, up to 20 per batch, including whole folders. The output keeps the original format or converts to PNG, JPEG or WebP." }
+        },
+        {
+          "@type": "Question",
+          "name": "Will compression reduce image quality?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The Quality slider (10–95%) sets the trade-off. JPEG and WebP are re-encoded at that quality. PNG stays lossless at 90% and above; from 65% to 89% it is reduced to a 256-color palette, and to fewer colors below that. When you keep the original format and a result comes out larger than the original, TinySquish keeps the original file." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I resize images too?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Resize by percentage (10–200%) or to an exact width and height, with the aspect ratio locked by default." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is TinySquish free?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. There is no account, no daily limit and no watermark on your images." }
+        },
+        {
+          "@type": "Question",
+          "name": "How is TinySquish different from TinyPNG and other online compressors?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Upload-based compressors such as TinyPNG send your files to their servers to process them. TinySquish does the work on your own device, so your images stay private, it works offline, and there is no upload to wait for." }
+        }
+      ]
+    }
+  ]
+}
+</script>
 </head>
 <body>
 
-<!-- This is just a shell — real content is injected by loader.js -->
-<div id="app-root">
-  <div class="loading-screen" id="loadingScreen">
-    <div class="loading-logo">🐼</div>
-    <h1>TinySquish</h1>
-    <p>Loading compressor engine...</p>
-    <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+<header class="header">
+  <div class="brand"><span class="brand-icon" aria-hidden="true">🐼</span><span class="brand-name">TinySquish</span></div>
+  <h1 class="brand-tagline">Compress PNG, JPEG &amp; WebP images in your browser — nothing is uploaded</h1>
+</header>
+
+<main>
+  <!-- The app itself is injected here by loader.js -->
+  <div id="app-root">
+    <div class="loading-screen" id="loadingScreen">
+      <div class="loading-logo" aria-hidden="true">🐼</div>
+      <p class="loading-title">Loading compressor…</p>
+      <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+    </div>
   </div>
-</div>
+
+  <div class="info">
+    <section aria-labelledby="how-title">
+      <h2 id="how-title">How it works</h2>
+      <ol class="steps">
+        <li><strong>Add images.</strong> Drop PNG, JPEG or WebP files, or a whole folder, onto the page. Up to 20 at a time.</li>
+        <li><strong>Pick the output.</strong> Set the quality, keep the format or convert to JPEG, PNG or WebP, and resize if you like. Every change recompresses right away.</li>
+        <li><strong>Compare and download.</strong> Drag the before/after slider to check the result, then save single files or everything as one ZIP.</li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="why-title">
+      <h2 id="why-title">Why TinySquish</h2>
+      <ul class="facts">
+        <li><strong>Private by design.</strong> Compression runs in your browser. Your images never leave your device.</li>
+        <li><strong>Works offline.</strong> After your first visit the app is saved in your browser and keeps working without a connection.</li>
+        <li><strong>Lossless PNG when you need it.</strong> At 90% quality and above, PNGs are re-encoded without losing a pixel; lower settings shrink the palette for much smaller files.</li>
+        <li><strong>Free, no sign-up, no watermark.</strong> No account, no daily limit, nothing added to your images.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="faq-title">
+      <h2 id="faq-title">Frequently asked questions</h2>
+      <div class="faq">
+        <details>
+          <summary>Are my images uploaded to a server?</summary>
+          <p>No. TinySquish compresses images locally in your browser, so the files never leave your device. The only thing the site sends is an anonymous visit count, and your IP address is never stored.</p>
+        </details>
+        <details>
+          <summary>Does TinySquish work offline?</summary>
+          <p>Yes. A service worker saves the app on your first visit. After that you can open tinysquish.com and compress images without an internet connection.</p>
+        </details>
+        <details>
+          <summary>Which image formats are supported?</summary>
+          <p>You can add PNG, JPEG and WebP images, up to 20 per batch, including whole folders. The output keeps the original format or converts to PNG, JPEG or WebP.</p>
+        </details>
+        <details>
+          <summary>Will compression reduce image quality?</summary>
+          <p>The Quality slider (10–95%) sets the trade-off. JPEG and WebP are re-encoded at that quality. PNG stays lossless at 90% and above; from 65% to 89% it is reduced to a 256-color palette, and to fewer colors below that. When you keep the original format and a result comes out larger than the original, TinySquish keeps the original file.</p>
+        </details>
+        <details>
+          <summary>Can I resize images too?</summary>
+          <p>Yes. Resize by percentage (10–200%) or to an exact width and height, with the aspect ratio locked by default.</p>
+        </details>
+        <details>
+          <summary>Is TinySquish free?</summary>
+          <p>Yes. There is no account, no daily limit and no watermark on your images.</p>
+        </details>
+        <details>
+          <summary>How is TinySquish different from TinyPNG and other online compressors?</summary>
+          <p>Upload-based compressors such as TinyPNG send your files to their servers to process them. TinySquish does the work on your own device, so your images stay private, it works offline, and there is no upload to wait for.</p>
+        </details>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="footer">
+  <p>🐼 TinySquish · Works offline after your first visit</p>
+  <p class="visitor-count" id="visitorCount" hidden></p>
+</footer>
 
 <noscript>
-  <div style="text-align:center;padding:4rem 2rem;font-family:sans-serif;">
-    <h1>🐼 TinySquish</h1>
-    <p style="margin-top:1rem;color:#636E72;">JavaScript is required to run this application.</p>
-  </div>
+  <p style="text-align:center;padding:1rem 2rem 3rem;color:#5a5a58;">JavaScript is required to run the compressor.</p>
 </noscript>
 
 <!-- Protection: integrity check + dynamic load -->

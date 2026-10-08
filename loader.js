@@ -126,14 +126,14 @@
   function injectApp() {
     // Verify we're running from expected origin (not a local file save)
     if (window.location.protocol === 'file:') {
-      document.getElementById('app-root').innerHTML = '<div style="text-align:center;padding:4rem;font-family:sans-serif;"><h1>🐼 TinySquish</h1><p style="color:#E17055;margin-top:1rem;font-weight:600;">This application cannot run from a local file.</p><p style="color:#636E72;margin-top:0.5rem;">Please access it from the original website.</p></div>';
+      document.getElementById('app-root').innerHTML = '<div style="text-align:center;padding:4rem;font-family:sans-serif;"><p style="font-size:1.5rem;font-weight:700;">🐼 TinySquish</p><p style="color:#E17055;margin-top:1rem;font-weight:600;">This application cannot run from a local file.</p><p style="color:#636E72;margin-top:0.5rem;">Please access it from the original website.</p></div>';
       return;
     }
 
     // Load dependencies sequentially: pako → UPNG → app.js
     // UPNG.js captures window.pako at execution time, so pako must load first.
     function showError() {
-      document.getElementById('app-root').innerHTML = '<div style="text-align:center;padding:4rem;font-family:sans-serif;"><h1>🐼 TinySquish</h1><p style="color:#E17055;margin-top:1rem;">Failed to load application engine. Please refresh.</p></div>';
+      document.getElementById('app-root').innerHTML = '<div style="text-align:center;padding:4rem;font-family:sans-serif;"><p style="font-size:1.5rem;font-weight:700;">🐼 TinySquish</p><p style="color:#E17055;margin-top:1rem;">Failed to load application engine. Please refresh.</p></div>';
     }
 
     function loadScript(src, onDone) {

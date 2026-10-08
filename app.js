@@ -32,11 +32,8 @@ window.__initTinySquish = function() {
   root.innerHTML = '';
 
   root.innerHTML = [
-    '<header class="header">',
-    '<div class="brand"><span class="brand-icon">\uD83D\uDC3C</span><span class="brand-name">TinySquish</span></div>',
-    '<p class="brand-tagline">Compress images in your browser \u2014 nothing is uploaded</p>',
-    '</header>',
-    '<main class="container">',
+    // Header, explainer content and footer are static in index.html so crawlers see them
+    '<div class="container">',
     '<div class="drop-zone" id="dropZone">',
     '<span class="drop-zone-icon">' + icon('image', 40) + '</span>',
     '<h2><span class="dz-title-empty">Drop images here</span><span class="dz-title-more">Add more images</span></h2>',
@@ -107,7 +104,7 @@ window.__initTinySquish = function() {
     '</div>',
     '<button class="btn btn-primary btn-lg" id="downloadAllBtn" disabled>Download all</button>',
     '</div>',
-    '</main>',
+    '</div>',
     '<div class="modal-overlay" id="comparisonModal">',
     '<div class="modal">',
     '<div class="modal-header">',
@@ -128,8 +125,6 @@ window.__initTinySquish = function() {
     '</div>',
     '</div>',
     '<div class="toast-container" id="toastContainer" role="status" aria-live="polite"></div>',
-    '<footer class="footer"><p>\uD83D\uDC3C TinySquish \u00B7 Works offline after your first visit</p>',
-    '<p class="visitor-count" id="visitorCount" hidden></p></footer>',
     '<div class="devtools-warning" id="devtoolsWarning">',
     '<div style="font-size:2.5rem">\uD83D\uDEE1\uFE0F</div>',
     '<h2>Developer Tools Detected</h2>',
