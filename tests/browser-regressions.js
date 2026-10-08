@@ -51,8 +51,7 @@ async function openApp(browser, init = '') {
 
 async function compressWithQuality(page, files, q) {
   await page.evaluate((q) => { const s = document.getElementById('qualitySlider'); s.value = q; s.dispatchEvent(new Event('input')); }, q);
-  await page.setInputFiles('#fileInput', files);
-  await page.click('#compressAllBtn');
+  await page.setInputFiles('#fileInput', files);  // compression starts automatically
   await page.waitForFunction((n) => document.querySelectorAll('.download-btn').length >= n, files.length, { timeout: 20000 });
 }
 
@@ -159,6 +158,39 @@ async function inspectLastPng(page, origB64) {
       }));
       check('5. compare modal: original and compressed images share one box', JSON.stringify(boxes[0]) === JSON.stringify(boxes[1]),
         JSON.stringify(boxes));
+      await ctx.close();
+    }
+
+    // ---- Design FINDING-002: changing a setting after compression recompresses every file
+    {
+      const { ctx, page } = await openApp(browser);
+      await compressWithQuality(page, [{ name: 'r.png', mimeType: 'image/png', buffer: pngA },
+        { name: 's.png', mimeType: 'image/png', buffer: pngB }], 50);
+      const before = await page.textContent('#summaryCompressed');
+      await page.selectOption('#formatSelect', 'image/jpeg');
+      await page.waitForFunction(() => [...document.querySelectorAll('.file-name')].length === 2
+        && document.querySelectorAll('.download-btn').length === 2
+        && !document.querySelector('.file-status'), null, { timeout: 20000 });
+      await page.waitForTimeout(300);
+      const after = await page.textContent('#summaryCompressed');
+      const jpegs = await page.evaluate(() => window.__blobs.filter(b => b.type === 'image/jpeg').length);
+      check('6. changing format after compression recompresses all files', jpegs >= 2 && before !== after, `${before} -> ${after}, jpegs=${jpegs}`);
+      await ctx.close();
+    }
+
+    // ---- FINDING-002 race: a setting change mid-compression must win over the in-flight result
+    {
+      const { ctx, page } = await openApp(browser);
+      await page.setInputFiles('#fileInput', [{ name: 'a.png', mimeType: 'image/png', buffer: pngA },
+        { name: 'b.png', mimeType: 'image/png', buffer: pngB }, { name: 'c.png', mimeType: 'image/png', buffer: pngA }]);
+      await page.selectOption('#formatSelect', 'image/webp');   // fires while file 1 is compressing
+      await page.waitForFunction(() => document.querySelectorAll('.download-btn').length === 3 && !document.querySelector('.file-status'), null, { timeout: 20000 });
+      const zipNames = await (async () => {
+        const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#downloadAllBtn')]);
+        const p = path.join(TMP, 'race.zip'); await dl.saveAs(p);
+        return JSON.parse(execFileSync('python3', ['-I', '-c', 'import zipfile,sys,json; print(json.dumps(zipfile.ZipFile(sys.argv[1]).namelist()))', p]).toString());
+      })();
+      check('6b. setting change mid-compression: every output uses the new format', zipNames.length === 3 && zipNames.every(n => n.endsWith('.webp')), JSON.stringify(zipNames));
       await ctx.close();
     }
   } finally {
