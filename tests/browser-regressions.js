@@ -1,5 +1,6 @@
 // Browser regression tests (Playwright + Chromium).
 // Run from repo root: NODE_PATH=~/node_modules node tests/browser-regressions.js
+// Against live:      TINYSQUISH_URL=https://tinysquish.com/ NODE_PATH=~/node_modules node tests/browser-regressions.js
 const { chromium } = require('playwright');
 const { spawn, execFileSync } = require('child_process');
 const fs = require('fs');
@@ -7,7 +8,7 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const PORT = 8789;
-const URL_ = `http://127.0.0.1:${PORT}/`;
+const URL_ = process.env.TINYSQUISH_URL || `http://127.0.0.1:${PORT}/`;
 const TMP = fs.mkdtempSync(path.join(require('os').tmpdir(), 'tinysquish-test-'));
 const results = [];
 const check = (name, ok, info = '') => { results.push({ name, ok }); console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${info ? '  — ' + info : ''}`); };
@@ -70,8 +71,9 @@ async function inspectLastPng(page, origB64) {
 }
 
 (async () => {
-  const server = spawn('python3', ['-m', 'http.server', String(PORT), '--bind', '127.0.0.1'], { cwd: ROOT, stdio: 'ignore' });
-  await new Promise(r => setTimeout(r, 800));
+  const server = process.env.TINYSQUISH_URL ? null
+    : spawn('python3', ['-m', 'http.server', String(PORT), '--bind', '127.0.0.1'], { cwd: ROOT, stdio: 'ignore' });
+  if (server) await new Promise(r => setTimeout(r, 800));
   const browser = await chromium.launch();
   try {
     // ---- Bug 1: browser sidebar (outerWidth - innerWidth > 160) must not hide the app
@@ -147,7 +149,7 @@ async function inspectLastPng(page, origB64) {
     }
   } finally {
     await browser.close();
-    server.kill();
+    if (server) server.kill();
   }
   const failed = results.filter(r => !r.ok).length;
   console.log(`\n${results.length - failed}/${results.length} passed`);
