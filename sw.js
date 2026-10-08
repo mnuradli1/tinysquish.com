@@ -3,7 +3,7 @@
  * Purpose: Intercept requests to prevent easy offline saving & add cache control
  */
 
-const CACHE_NAME = 'tinysquish-v4';
+const CACHE_NAME = 'tinysquish-v5';
 const ORIGIN_CHECK = true;
 
 // Install — cache core assets
@@ -45,6 +45,13 @@ self.addEventListener('fetch', function(event) {
   // Only handle same-origin requests
   if (url.origin !== self.location.origin) return;
 
+  // Never intercept the API (POST can't be cached; counts must be live)
+  if (event.request.method !== 'GET' || url.pathname.startsWith('/api/')) return;
+
+  // loader.js appends ?v=<timestamp> to scripts; key the cache by path only,
+  // otherwise every visit adds new entries and offline lookups never hit.
+  const cacheKey = url.origin + url.pathname;
+
   event.respondWith(
     fetch(event.request).then(function(response) {
       // Clone response and add protective headers
@@ -64,16 +71,18 @@ self.addEventListener('fetch', function(event) {
         headers: headers
       });
 
-      // Update cache
-      const responseClone = modifiedResponse.clone();
-      caches.open(CACHE_NAME).then(function(cache) {
-        cache.put(event.request, responseClone);
-      });
+      // Update cache (only good responses — don't overwrite with a 404/500)
+      if (response.ok) {
+        const responseClone = modifiedResponse.clone();
+        caches.open(CACHE_NAME).then(function(cache) {
+          cache.put(cacheKey, responseClone);
+        });
+      }
 
       return modifiedResponse;
     }).catch(function() {
       // Offline fallback from cache
-      return caches.match(event.request).then(function(cached) {
+      return caches.match(cacheKey).then(function(cached) {
         if (cached) return cached;
         // Return error page for navigation
         if (event.request.mode === 'navigate') {

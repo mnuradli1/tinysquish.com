@@ -776,6 +776,11 @@ input[type="file"], input[type="range"], input[type="number"], select {
   font-size: 0.72rem;
 }
 
+.footer .visitor-count {
+  margin-top: 0.35rem;
+  font-variant-numeric: tabular-nums;
+}
+
 /* ===== WATERMARK ===== */
 .watermark {
   position: fixed;

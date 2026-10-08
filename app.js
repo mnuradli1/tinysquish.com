@@ -119,7 +119,8 @@ window.__initTinySquish = function() {
     '</div>',
     '</div>',
     '<div class="toast-container" id="toastContainer"></div>',
-    '<footer class="footer"><p>\uD83D\uDC3C TinySquish \u2014 100% local processing, zero uploads</p></footer>',
+    '<footer class="footer"><p>\uD83D\uDC3C TinySquish \u2014 100% local processing, zero uploads</p>',
+    '<p class="visitor-count" id="visitorCount" hidden></p></footer>',
     '<div class="devtools-warning" id="devtoolsWarning">',
     '<div style="font-size:2.5rem">\uD83D\uDEE1\uFE0F</div>',
     '<h2>Developer Tools Detected</h2>',
@@ -146,6 +147,12 @@ window.__initTinySquish = function() {
     if (bytes < 1024) return bytes + ' B';
     if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
     return (bytes / 1048576).toFixed(2) + ' MB';
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function(c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
   }
 
   function getExt(mime) {
@@ -700,8 +707,9 @@ window.__initTinySquish = function() {
     el.id = 'file-' + fo.id;
     var savings = fo.compressedSize > 0 ? Math.round((1 - fo.compressedSize / fo.originalSize) * 100) : 0;
     var sc = savings > 50 ? 'great' : 'good';
-    var html = '<img class="file-thumb" src="' + fo.originalUrl + '" alt="' + fo.file.name + '">';
-    html += '<div class="file-info"><div class="file-name">' + fo.file.name + '</div><div class="file-meta">';
+    var safeName = escapeHtml(fo.file.name);
+    var html = '<img class="file-thumb" src="' + fo.originalUrl + '" alt="' + safeName + '">';
+    html += '<div class="file-info"><div class="file-name">' + safeName + '</div><div class="file-meta">';
     html += '<span class="file-size-original">' + formatSize(fo.originalSize) + '</span>';
     if (fo._origW && fo._outW && (fo._outW !== fo._origW || fo._outH !== fo._origH)) {
       html += '<span class="file-dims">' + fo._origW + '\u00D7' + fo._origH + ' \u2192 ' + fo._outW + '\u00D7' + fo._outH + '</span>';
@@ -750,6 +758,25 @@ window.__initTinySquish = function() {
   function updateDownloadBtn() {
     document.getElementById('downloadAllBtn').disabled = !state.files.some(function(f) { return f.status === 'done'; });
   }
+
+  // ===== VISITOR COUNTER =====
+  // Only aggregate counts — images never leave the browser.
+  // Count once per browser session; later loads just read the numbers.
+  function loadVisitorCount() {
+    var el = document.getElementById('visitorCount');
+    var counted = false;
+    try { counted = sessionStorage.getItem('ts_counted') === '1'; } catch(e) {}
+    fetch('/api/visits', { method: counted ? 'GET' : 'POST', cache: 'no-store' })
+      .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(d) {
+        try { sessionStorage.setItem('ts_counted', '1'); } catch(e) {}
+        var fmt = function(n) { return Number(n).toLocaleString('en-US'); };
+        el.textContent = '👀 ' + fmt(d.total) + ' visitor' + (d.total === 1 ? '' : 's') + ' · ' + fmt(d.today) + ' today';
+        el.hidden = false;
+      })
+      .catch(function() {}); // offline or API down: keep the counter hidden
+  }
+  loadVisitorCount();
 
   // Expose for thumbnail click in comparison
   window._tsShowComparison = showComparison;

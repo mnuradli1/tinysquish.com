@@ -12,9 +12,7 @@
     's': true,   // Ctrl+S (save)
     'u': true,   // Ctrl+U (view source)
     'p': true,   // Ctrl+P (print)
-    'j': true,   // Ctrl+Shift+J (console)
-    'i': true,   // Ctrl+Shift+I (devtools)
-    'c': true,   // Ctrl+Shift+C (inspect element)
+    // Ctrl+Shift+I/J/C are handled below — plain Ctrl+C (copy) must keep working
   };
 
   document.addEventListener('keydown', function(e) {
@@ -170,9 +168,7 @@
     });
   }
 
-  // Wait for loading animation, then inject
-  window.addEventListener('DOMContentLoaded', function() {
-    setTimeout(injectApp, 1800);
-  });
+  // Inject as soon as the DOM is ready (the loading screen shows while scripts load)
+  window.addEventListener('DOMContentLoaded', injectApp);
 
 })();
