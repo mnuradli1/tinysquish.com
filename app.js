@@ -667,7 +667,8 @@ window.__initTinySquish = function() {
 
   // ===== QUALITY SLIDER =====
   document.getElementById('qualitySlider').addEventListener('input', function(e) {
-    document.getElementById('qualityValue').textContent = e.target.value + '%';
+    // Matches compressImage: PNG output is lossless from 90% up
+    document.getElementById('qualityValue').textContent = e.target.value + '%' + (e.target.value >= 90 ? ' \u00B7 PNG lossless' : '');
   });
   document.getElementById('qualitySlider').addEventListener('change', function() { recompressAll(); });
   document.getElementById('formatSelect').addEventListener('change', function() { recompressAll(); });
