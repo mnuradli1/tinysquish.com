@@ -48,7 +48,6 @@ window.__initTinySquish = function() {
     '</select>',
     '</div>',
     '<div class="action-buttons">',
-    '<button class="btn btn-primary" id="compressAllBtn">Compress All</button>',
     '<button class="btn btn-success" id="downloadAllBtn" disabled>Download ZIP</button>',
     '<button class="btn btn-danger" id="clearAllBtn">Clear</button>',
     '</div>',
@@ -298,6 +297,7 @@ window.__initTinySquish = function() {
     });
     updateUI();
     toast('Added ' + toAdd.length + ' image' + (toAdd.length > 1 ? 's' : ''), 'success');
+    runQueue();
   }
 
   function removeFile(id) {
@@ -396,6 +396,7 @@ window.__initTinySquish = function() {
   }
 
   async function compressImage(fileObj) {
+    var gen = settingsGen;
     var quality = parseInt(document.getElementById('qualitySlider').value) / 100;
     var targetFormat = document.getElementById('formatSelect').value;
     var outputMime = targetFormat === 'original' ? fileObj.file.type : targetFormat;
@@ -486,29 +487,50 @@ window.__initTinySquish = function() {
         blob = fileObj.file;
       }
 
+      // Settings changed mid-compression: drop this result, the queue redoes the file
+      if (gen !== settingsGen) { fileObj.status = 'pending'; updateFileItem(fileObj); return; }
+
       fileObj.compressedBlob = blob;
       if (fileObj.compressedUrl) URL.revokeObjectURL(fileObj.compressedUrl);
       fileObj.compressedUrl = URL.createObjectURL(fileObj.compressedBlob);
       fileObj.compressedSize = fileObj.compressedBlob.size;
       fileObj.status = 'done';
     } catch(err) {
+      if (gen !== settingsGen) { fileObj.status = 'pending'; updateFileItem(fileObj); return; }
       fileObj.status = 'error';
       toast('Failed to compress ' + fileObj.file.name, 'error');
     }
     updateFileItem(fileObj);
   }
 
-  // ===== COMPRESS ALL =====
-  document.getElementById('compressAllBtn').addEventListener('click', async function() {
-    var pending = state.files.filter(function(f) { return f.status === 'pending' || f.status === 'error'; });
-    if (!pending.length) { toast('No files to compress', 'info'); return; }
-    this.disabled = true;
-    for (var i = 0; i < pending.length; i++) await compressImage(pending[i]);
-    this.disabled = false;
-    updateSummary();
-    updateDownloadBtn();
-    toast('All images compressed!', 'success');
-  });
+  // ===== AUTO-COMPRESS QUEUE =====
+  // Files compress as soon as they're added, and again whenever an output setting changes.
+  // settingsGen invalidates results computed with settings that are no longer current.
+  var settingsGen = 0, queueRunning = false, recompressTimer = null;
+
+  async function runQueue() {
+    if (queueRunning) return;
+    queueRunning = true;
+    var next;
+    while ((next = state.files.find(function(f) { return f.status === 'pending'; }))) {
+      await compressImage(next);
+      updateSummary();
+      updateDownloadBtn();
+    }
+    queueRunning = false;
+  }
+
+  function recompressAll(delay) {
+    clearTimeout(recompressTimer);
+    recompressTimer = setTimeout(function() {
+      if (!state.files.length) return;
+      settingsGen++;
+      state.files.forEach(function(f) {
+        if (f.status !== 'compressing') { f.status = 'pending'; updateFileItem(f); }
+      });
+      runQueue();
+    }, delay || 0);
+  }
 
   // ===== DOWNLOAD =====
   function downloadFile(fileObj) {
@@ -638,6 +660,8 @@ window.__initTinySquish = function() {
   document.getElementById('qualitySlider').addEventListener('input', function(e) {
     document.getElementById('qualityValue').textContent = e.target.value + '%';
   });
+  document.getElementById('qualitySlider').addEventListener('change', function() { recompressAll(); });
+  document.getElementById('formatSelect').addEventListener('change', function() { recompressAll(); });
 
   // ===== RESIZE CONTROLS =====
   var resizeModeSelect = document.getElementById('resizeMode');
@@ -667,6 +691,7 @@ window.__initTinySquish = function() {
       }
     }
     updateResizePreview();
+    recompressAll();
   });
 
   resizePercentSlider.addEventListener('input', function() {
@@ -674,6 +699,7 @@ window.__initTinySquish = function() {
     resizePercentValueEl.textContent = this.value + '%';
     updateResizePreview();
   });
+  resizePercentSlider.addEventListener('change', function() { recompressAll(); });
 
   resizeWidthInput.addEventListener('input', function() {
     resizeState.width = parseInt(this.value) || 0;
@@ -682,6 +708,7 @@ window.__initTinySquish = function() {
       resizeHeightInput.value = resizeState.height;
     }
     updateResizePreview();
+    recompressAll(500);
   });
 
   resizeHeightInput.addEventListener('input', function() {
@@ -691,6 +718,7 @@ window.__initTinySquish = function() {
       resizeWidthInput.value = resizeState.width;
     }
     updateResizePreview();
+    recompressAll(500);
   });
 
   aspectLockBtn.addEventListener('click', function() {
@@ -729,7 +757,7 @@ window.__initTinySquish = function() {
     if (fo.status === 'done') html += ' <span>\u2192</span> <span class="file-size-compressed">' + formatSize(fo.compressedSize) + '</span> <span class="file-savings ' + sc + '">-' + savings + '%</span>';
     if (fo.status === 'compressing') html += '<span class="file-status compressing"><span class="spinner"></span> Compressing...</span>';
     if (fo.status === 'error') html += '<span class="file-status error">Error</span>';
-    if (fo.status === 'pending') html += '<span class="file-status">Ready</span>';
+    if (fo.status === 'pending') html += '<span class="file-status">Waiting\u2026</span>';
     html += '</div></div><div class="file-actions">';
     if (fo.status === 'done') html += '<button class="file-btn compare-btn" data-id="' + fo.id + '" title="Compare" aria-label="Compare original and compressed">\uD83D\uDD0D</button><button class="file-btn download-btn" data-id="' + fo.id + '" title="Download" aria-label="Download compressed image">\u2B07\uFE0F</button>';
     html += '<button class="file-btn delete remove-btn" data-id="' + fo.id + '" title="Remove" aria-label="Remove image">\u2715</button></div>';
