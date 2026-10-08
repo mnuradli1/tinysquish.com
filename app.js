@@ -767,7 +767,7 @@ window.__initTinySquish = function() {
     if (fo._origW && fo._outW && (fo._outW !== fo._origW || fo._outH !== fo._origH)) {
       html += '<span class="file-dims">' + fo._origW + '\u00D7' + fo._origH + ' \u2192 ' + fo._outW + '\u00D7' + fo._outH + '</span>';
     }
-    if (fo.status === 'done') html += ' <span>\u2192</span> <span class="file-size-compressed">' + formatSize(fo.compressedSize) + '</span> <span class="file-savings ' + sc + '">-' + savings + '%</span>';
+    if (fo.status === 'done') html += ' <span>\u2192</span> <span class="file-size-compressed">' + formatSize(fo.compressedSize) + '</span> <span class="file-savings ' + sc + '">' + (savings > 0 ? '\u2212' + savings : savings < 0 ? '+' + (-savings) : 0) + '%</span>';
     if (fo.status === 'compressing') html += '<span class="file-status compressing"><span class="spinner"></span> Compressing...</span>';
     if (fo.status === 'error') html += '<span class="file-status error">Error</span>';
     if (fo.status === 'pending') html += '<span class="file-status">Waiting\u2026</span>';
