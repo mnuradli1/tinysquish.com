@@ -193,6 +193,39 @@ async function inspectLastPng(page, origB64) {
       check('6b. setting change mid-compression: every output uses the new format', zipNames.length === 3 && zipNames.every(n => n.endsWith('.webp')), JSON.stringify(zipNames));
       await ctx.close();
     }
+
+    // ---- Clear all can be undone; blob URLs are only released once the undo window closes
+    {
+      const { ctx, page } = await openApp(browser);
+      await compressWithQuality(page, [{ name: 'u1.png', mimeType: 'image/png', buffer: pngA },
+        { name: 'u2.png', mimeType: 'image/png', buffer: pngB }], 50);
+      await page.click('#clearAllBtn');
+      const afterClear = await page.$$eval('.file-item', els => els.length);
+      await page.click('.toast-action');
+      await page.waitForFunction(() => document.querySelectorAll('.download-btn').length === 2);
+      const restored = await page.evaluate(async () => {
+        const url = document.getElementById('compressedPreview') && window.__blobs.filter(b => b.type === 'image/png').pop().u;
+        try { await (await fetch(url)).blob(); return { ok: true, revoked: window.__revoked.length }; } catch (e) { return { ok: false }; }
+      });
+      check('7. Clear all + Undo restores files with live blob URLs', afterClear === 0 && restored.ok
+        && !(await page.isDisabled('#downloadAllBtn')), JSON.stringify({ afterClear, restored }));
+      // Clear → add another file → change format → Undo: restored files must use the new format too
+      await page.click('#clearAllBtn');
+      await page.setInputFiles('#fileInput', [{ name: 'u3.png', mimeType: 'image/png', buffer: pngA }]);
+      await page.selectOption('#formatSelect', 'image/webp');
+      await page.click('.toast-action');
+      await page.waitForFunction(() => document.querySelectorAll('.download-btn').length === 3 && !document.querySelector('.file-status'), null, { timeout: 20000 });
+      const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#downloadAllBtn')]);
+      const undoZip = path.join(TMP, 'undo.zip'); await dl.saveAs(undoZip);
+      const undoNames = JSON.parse(execFileSync('python3', ['-I', '-c', 'import zipfile,sys,json; print(json.dumps(zipfile.ZipFile(sys.argv[1]).namelist()))', undoZip]).toString());
+      check('7c. Undo after a setting change recompresses restored files', undoNames.length === 3 && undoNames.every(n => n.endsWith('.webp')), JSON.stringify(undoNames));
+      const before = await page.evaluate(() => window.__revoked.length);
+      await page.click('#clearAllBtn');
+      await page.waitForTimeout(6800);
+      const revoked = await page.evaluate((b) => window.__revoked.length - b, before);
+      check('7b. without Undo, blob URLs are revoked after the undo window', revoked >= 6 && !(await page.$('.toast-action')), `revoked=${revoked}`);
+      await ctx.close();
+    }
   } finally {
     await browser.close();
     if (server) server.kill();
