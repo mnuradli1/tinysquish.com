@@ -625,7 +625,7 @@ window.__initTinySquish = function() {
     var pos = Math.max(0, Math.min(x, rect.width));
     var pct = (pos / rect.width) * 100;
     document.getElementById('comparisonSlider').style.left = pct + '%';
-    document.getElementById('comparisonOriginal').style.width = pct + '%';
+    document.getElementById('comparisonOriginal').style.clipPath = 'inset(0 ' + (100 - pct) + '% 0 0)';
   }
   ctr.addEventListener('mousedown', function(e) { sliderDrag = true; setSlider(e.clientX - ctr.getBoundingClientRect().left); });
   window.addEventListener('mousemove', function(e) { if (sliderDrag) setSlider(e.clientX - ctr.getBoundingClientRect().left); });
