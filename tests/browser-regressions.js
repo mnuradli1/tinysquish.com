@@ -147,6 +147,20 @@ async function inspectLastPng(page, origB64) {
       check('4b. PNG at 75% still quantized to <=256 colors', r.uniqueColors <= 256, `uniqueColors=${r.uniqueColors}`);
       await ctx.close();
     }
+
+    // ---- Design FINDING-001: comparison overlay must not rescale the original image
+    {
+      const { ctx, page } = await openApp(browser);
+      await compressWithQuality(page, [{ name: 'c.png', mimeType: 'image/png', buffer: pngA }], 50);
+      await page.click('.compare-btn');
+      await page.waitForTimeout(300);
+      const boxes = await page.evaluate(() => ['originalPreview', 'compressedPreview'].map(id => {
+        const r = document.getElementById(id).getBoundingClientRect(); return [r.x, r.y, r.width, r.height].map(Math.round);
+      }));
+      check('5. compare modal: original and compressed images share one box', JSON.stringify(boxes[0]) === JSON.stringify(boxes[1]),
+        JSON.stringify(boxes));
+      await ctx.close();
+    }
   } finally {
     await browser.close();
     if (server) server.kill();
