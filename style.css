@@ -343,21 +343,13 @@ input[type="file"], input[type="range"], input[type="number"], select {
 }
 .btn-primary:hover { background: var(--green-dark); }
 
-.btn-success {
-  background: var(--text);
-  color: white;
-}
-.btn-success:hover { background: #333; }
-
-.btn-danger {
+.btn-ghost {
   background: transparent;
-  color: var(--red);
-  border: 1.5px solid var(--red);
-  padding: 0.35rem 0.85rem;
+  color: var(--text-2);
 }
-.btn-danger:hover {
-  background: var(--red);
-  color: white;
+.btn-ghost:hover {
+  background: var(--red-soft);
+  color: var(--red);
 }
 
 .btn:disabled {
@@ -599,41 +591,53 @@ input[type="file"], input[type="range"], input[type="number"], select {
 .file-status.error { color: var(--red); }
 
 /* ===== SUMMARY BAR ===== */
+/* Sticky so the batch result and its download stay in reach on long lists */
 .summary-bar {
   display: none;
+  position: sticky;
+  bottom: 0.75rem;
+  z-index: 50;
   background: var(--text);
-  border-radius: var(--radius);
-  padding: 1rem 1.25rem;
   color: white;
-  flex-wrap: wrap;
-  gap: 1.25rem;
+  border-radius: var(--radius);
+  padding: 0.75rem 0.75rem 0.75rem 1.25rem;
   align-items: center;
-  justify-content: center;
-  box-shadow: var(--shadow-md);
+  gap: 1rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
 }
 
 .summary-bar.visible { display: flex; }
 
-.summary-stat { text-align: center; }
+.summary-text { flex: 1; min-width: 0; }
 
-.summary-stat .value {
-  font-size: 1.25rem;
+.summary-main {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.85);
+}
+
+.summary-saved {
+  font-size: 1.5rem;
   font-weight: 800;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.02em;
+  color: #86efac;
+  font-variant-numeric: tabular-nums;
 }
 
-.summary-stat .label {
-  font-size: 0.65rem;
-  opacity: 0.6;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  margin-top: 0.1rem;
+.summary-detail {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.7);
+  font-variant-numeric: tabular-nums;
 }
 
-.summary-divider {
-  width: 1px;
-  height: 32px;
-  background: rgba(255,255,255,0.15);
+.btn-lg {
+  padding: 0.7rem 1.4rem;
+  font-size: 0.95rem;
+}
+
+.summary-bar .btn-primary:disabled {
+  opacity: 1;
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.7);
 }
 
 /* ===== COMPARISON MODAL ===== */
@@ -882,17 +886,14 @@ input[type="file"], input[type="range"], input[type="number"], select {
   .file-meta { gap: 0.3rem; }
 
   .summary-bar {
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 0.85rem 1rem;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding: 0.75rem;
   }
 
-  .summary-divider {
-    width: 50px;
-    height: 1px;
-  }
+  .summary-text { padding-left: 0.25rem; }
 
-  .summary-stat .value { font-size: 1.1rem; }
+  .summary-bar .btn-lg { width: 100%; justify-content: center; }
 
   .resize-header {
     flex-direction: column;

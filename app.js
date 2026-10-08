@@ -48,8 +48,7 @@ window.__initTinySquish = function() {
     '</select>',
     '</div>',
     '<div class="action-buttons">',
-    '<button class="btn btn-success" id="downloadAllBtn" disabled>Download ZIP</button>',
-    '<button class="btn btn-danger" id="clearAllBtn">Clear</button>',
+    '<button class="btn btn-ghost" id="clearAllBtn">Clear all</button>',
     '</div>',
     '</div>',
     '<div class="resize-panel" id="resizePanel">',
@@ -89,13 +88,11 @@ window.__initTinySquish = function() {
     '</div>',
     '<div class="file-list" id="fileList"></div>',
     '<div class="summary-bar" id="summaryBar">',
-    '<div class="summary-stat"><div class="value" id="summaryCount">0</div><div class="label">Images</div></div>',
-    '<div class="summary-divider"></div>',
-    '<div class="summary-stat"><div class="value" id="summaryOriginal">0 KB</div><div class="label">Original</div></div>',
-    '<div class="summary-divider"></div>',
-    '<div class="summary-stat"><div class="value" id="summaryCompressed">0 KB</div><div class="label">Compressed</div></div>',
-    '<div class="summary-divider"></div>',
-    '<div class="summary-stat"><div class="value" id="summarySaved">0%</div><div class="label">Saved</div></div>',
+    '<div class="summary-text">',
+    '<p class="summary-main"><span class="summary-saved" id="summarySaved">0%</span> <span id="summarySavedLabel">smaller</span></p>',
+    '<p class="summary-detail"><span id="summaryOriginal">0 KB</span> \u2192 <span id="summaryCompressed">0 KB</span> \u00B7 <span id="summaryCount">0</span></p>',
+    '</div>',
+    '<button class="btn btn-primary btn-lg" id="downloadAllBtn" disabled>Download all</button>',
     '</div>',
     '</main>',
     '<div class="modal-overlay" id="comparisonModal">',
@@ -789,14 +786,20 @@ window.__initTinySquish = function() {
     bar.classList.add('visible');
     var totOrig = 0, totComp = 0;
     done.forEach(function(f) { totOrig += f.originalSize; totComp += f.compressedSize; });
-    document.getElementById('summaryCount').textContent = done.length;
+    var saved = totOrig > 0 ? Math.round((1 - totComp / totOrig) * 100) : 0;
+    document.getElementById('summaryCount').textContent = done.length + ' image' + (done.length === 1 ? '' : 's');
     document.getElementById('summaryOriginal').textContent = formatSize(totOrig);
     document.getElementById('summaryCompressed').textContent = formatSize(totComp);
-    document.getElementById('summarySaved').textContent = (totOrig > 0 ? Math.round((1 - totComp / totOrig) * 100) : 0) + '%';
+    document.getElementById('summarySaved').textContent = Math.abs(saved) + '%';
+    document.getElementById('summarySavedLabel').textContent = saved < 0 ? 'larger' : 'smaller';
   }
 
   function updateDownloadBtn() {
-    document.getElementById('downloadAllBtn').disabled = !state.files.some(function(f) { return f.status === 'done'; });
+    // Wait for the whole batch so the ZIP never silently misses files still in the queue
+    var btn = document.getElementById('downloadAllBtn');
+    var busy = state.files.some(function(f) { return f.status === 'pending' || f.status === 'compressing'; });
+    btn.disabled = busy || !state.files.some(function(f) { return f.status === 'done'; });
+    btn.textContent = busy ? 'Compressing\u2026' : 'Download all';
   }
 
   // ===== VISITOR COUNTER =====
