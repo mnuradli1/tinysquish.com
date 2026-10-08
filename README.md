@@ -6,7 +6,7 @@ Smart image compression yang berjalan 100% di browser pengunjung. VPS kamu hanya
 
 ## Fitur
 
-- **Kompresi gambar** — PNG (quantization + Floyd-Steinberg dithering), JPEG, WebP
+- **Kompresi gambar** — PNG (lossless di kualitas ≥90%, di bawahnya quantization + Floyd-Steinberg dithering), JPEG, WebP
 - **Drag & drop** — Seret file atau seluruh folder langsung ke halaman
 - **Upload folder** — Pilih folder dan otomatis scan semua gambar di dalamnya (termasuk subfolder)
 - **Konversi format** — PNG ↔ JPEG ↔ WebP

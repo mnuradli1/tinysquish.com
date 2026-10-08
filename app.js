@@ -441,14 +441,14 @@ window.__initTinySquish = function() {
           ctx.drawImage(img, 0, 0);
         }
         var rgba = ctx.getImageData(0, 0, w, h).data.buffer;
-        // Map quality slider to palette color count:
-        // 95% → 256, 75% → 256, 50% → 128, 25% → 64, 10% → 32
-        var colors = quality >= 0.65 ? 256 : Math.max(16, Math.round(256 * (quality / 0.65)));
+        // Map quality slider to palette color count (0 = lossless in UPNG):
+        // 90–95% → lossless, 65–89% → 256, 50% → 197, 25% → 98, 10% → 39
+        var colors = quality >= 0.9 ? 0 : quality >= 0.65 ? 256 : Math.max(16, Math.round(256 * (quality / 0.65)));
         var pngData = UPNG.encode([rgba], w, h, colors);
         blob = new Blob([pngData], { type: 'image/png' });
 
-        // If still bigger, try with fewer colors
-        if (blob.size >= fileObj.originalSize) {
+        // If still bigger, try with fewer colors (never when lossless was requested)
+        if (colors > 0 && blob.size >= fileObj.originalSize) {
           var fewer = Math.max(16, Math.round(colors * 0.5));
           var pngData2 = UPNG.encode([rgba], w, h, fewer);
           var blob2 = new Blob([pngData2], { type: 'image/png' });
@@ -530,25 +530,35 @@ window.__initTinySquish = function() {
     return (crc ^ 0xFFFFFFFF) >>> 0;
   }
 
+  // Same-named inputs would overwrite each other on extraction → "name (2).ext".
+  // Compared case-insensitively because Windows/macOS filesystems are.
+  function uniqueName(name, used) {
+    var base = name.replace(/\.[^.]+$/, ''), ext = name.slice(base.length), candidate = name;
+    for (var i = 2; used[candidate.toLowerCase()]; i++) candidate = base + ' (' + i + ')' + ext;
+    used[candidate.toLowerCase()] = true;
+    return candidate;
+  }
+
   async function buildZip(files) {
-    var localFiles = [], centralDir = [], offset = 0;
+    var localFiles = [], centralDir = [], offset = 0, used = {};
     for (var n = 0; n < files.length; n++) {
       var fo = files[n];
-      var name = fo.file.name.replace(/\.[^.]+$/, '') + '-compressed.' + getExt(fo.compressedBlob.type);
+      var name = uniqueName(fo.file.name.replace(/\.[^.]+$/, '') + '-compressed.' + getExt(fo.compressedBlob.type), used);
       var nameBytes = new TextEncoder().encode(name);
       var fileData = new Uint8Array(await fo.compressedBlob.arrayBuffer());
       var crc = crc32(fileData);
 
       var lh = new Uint8Array(30 + nameBytes.length);
       var lv = new DataView(lh.buffer);
-      lv.setUint32(0, 0x04034b50, true); lv.setUint16(4, 20, true);
+      // Flag bit 11: names are UTF-8 (otherwise unzippers read them as CP437)
+      lv.setUint32(0, 0x04034b50, true); lv.setUint16(4, 20, true); lv.setUint16(6, 0x0800, true);
       lv.setUint32(14, crc, true); lv.setUint32(18, fileData.length, true);
       lv.setUint32(22, fileData.length, true); lv.setUint16(26, nameBytes.length, true);
       lh.set(nameBytes, 30);
 
       var cd = new Uint8Array(46 + nameBytes.length);
       var cv = new DataView(cd.buffer);
-      cv.setUint32(0, 0x02014b50, true); cv.setUint16(4, 20, true); cv.setUint16(6, 20, true);
+      cv.setUint32(0, 0x02014b50, true); cv.setUint16(4, 20, true); cv.setUint16(6, 20, true); cv.setUint16(8, 0x0800, true);
       cv.setUint32(16, crc, true); cv.setUint32(20, fileData.length, true);
       cv.setUint32(24, fileData.length, true); cv.setUint16(28, nameBytes.length, true);
       cv.setUint32(38, 0x20, true); cv.setUint32(42, offset, true);
@@ -578,7 +588,9 @@ window.__initTinySquish = function() {
       a.href = URL.createObjectURL(zipBlob);
       a.download = 'tinysquish-compressed.zip';
       a.click();
-      URL.revokeObjectURL(a.href);
+      // Revoking synchronously can cancel the download in Safari/Firefox — give it time to start
+      var zipUrl = a.href;
+      setTimeout(function() { URL.revokeObjectURL(zipUrl); }, 60000);
       toast('ZIP downloaded!', 'success');
     } catch(err) { toast('Failed to create ZIP', 'error'); }
   });

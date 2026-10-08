@@ -3,7 +3,7 @@
  * Purpose: Intercept requests to prevent easy offline saving & add cache control
  */
 
-const CACHE_NAME = 'tinysquish-v5';
+const CACHE_NAME = 'tinysquish-v6';
 const ORIGIN_CHECK = true;
 
 // Install — cache core assets

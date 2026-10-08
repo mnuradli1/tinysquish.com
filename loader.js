@@ -55,26 +55,11 @@
   }, true);
 
   // ===== PROTECTION: Anti-DevTools detection =====
+  // Only the debugger trap is used: a window-size heuristic (outer - inner > 160px)
+  // false-positives on browser sidebars and page zoom, hiding the app from normal users.
   let devtoolsOpen = false;
 
-  function checkDevTools() {
-    const widthThreshold = window.outerWidth - window.innerWidth > 160;
-    const heightThreshold = window.outerHeight - window.innerHeight > 160;
-
-    if (widthThreshold || heightThreshold) {
-      if (!devtoolsOpen) {
-        devtoolsOpen = true;
-        onDevToolsOpen();
-      }
-    } else {
-      if (devtoolsOpen) {
-        devtoolsOpen = false;
-        onDevToolsClose();
-      }
-    }
-  }
-
-  // Debugger trap — triggers when devtools is open
+  // Debugger trap — `debugger` only pauses when devtools is open
   function debuggerTrap() {
     const start = performance.now();
     debugger;
@@ -84,6 +69,9 @@
         devtoolsOpen = true;
         onDevToolsOpen();
       }
+    } else if (devtoolsOpen) {
+      devtoolsOpen = false;
+      onDevToolsClose();
     }
   }
 
@@ -101,7 +89,6 @@
     if (appRoot) appRoot.style.display = '';
   }
 
-  setInterval(checkDevTools, 1000);
   setInterval(debuggerTrap, 3000);
 
   // ===== PROTECTION: Disable console methods =====
