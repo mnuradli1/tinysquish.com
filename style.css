@@ -249,18 +249,36 @@ input[type="file"], input[type="range"], input[type="number"], select {
 /* ===== OPTIONS BAR ===== */
 .options-bar {
   display: none;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 0.75rem 1.25rem;
   background: var(--surface);
   border-radius: var(--radius);
-  padding: 0.85rem 1rem;
+  padding: 1rem 1.25rem;
   box-shadow: var(--shadow-sm);
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
   border: 1px solid var(--border);
 }
 
-.options-bar.visible { display: flex; }
+.options-bar.visible { display: grid; }
+
+.setting {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.setting label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.setting .quality-slider { width: 100%; }
+.setting .format-select { width: 100%; }
 
 .option-group {
   display: flex;
@@ -273,6 +291,22 @@ input[type="file"], input[type="range"], input[type="number"], select {
   font-weight: 600;
   color: var(--text-2);
   white-space: nowrap;
+}
+
+/* ===== LIST HEADER ===== */
+.list-header {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.25rem 0 0 0.25rem;
+}
+
+.list-header.visible { display: flex; }
+
+.list-count {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-2);
 }
 
 /* ===== RANGE SLIDER ===== */
@@ -334,12 +368,6 @@ input[type="file"], input[type="range"], input[type="number"], select {
 }
 
 /* ===== BUTTONS ===== */
-.action-buttons {
-  display: flex;
-  gap: 0.4rem;
-  flex-wrap: wrap;
-}
-
 .btn {
   padding: 0.45rem 1rem;
   border: none;
@@ -377,27 +405,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
   pointer-events: none;
 }
 
-/* ===== RESIZE PANEL ===== */
-.resize-panel {
-  display: none;
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 0.75rem 1rem;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border);
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.resize-panel.visible { display: flex; }
-
-.resize-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
+/* ===== RESIZE CONTROLS ===== */
 .resize-preview {
   font-size: 0.75rem;
   font-weight: 600;
@@ -405,7 +413,16 @@ input[type="file"], input[type="range"], input[type="number"], select {
   white-space: nowrap;
 }
 
-.resize-controls { display: none; }
+/* Shown by JS (display:flex) when a resize mode is picked; spans the settings grid */
+.resize-controls {
+  display: none;
+  grid-column: 1 / -1;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  flex-wrap: wrap;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
 
 .resize-percent-controls,
 .resize-dim-controls {
@@ -881,23 +898,11 @@ input[type="file"], input[type="range"], input[type="number"], select {
   .drop-zone-icon { font-size: 2rem; }
 
   .options-bar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.6rem;
+    grid-template-columns: 1fr 1fr;
+    padding: 0.85rem 1rem;
   }
 
-  .option-group { justify-content: space-between; }
-
-  .action-buttons {
-    justify-content: stretch;
-  }
-
-  .action-buttons .btn {
-    flex: 1;
-    justify-content: center;
-    font-size: 0.78rem;
-    padding: 0.5rem 0.6rem;
-  }
+  .setting-quality { grid-column: 1 / -1; }
 
   .file-item {
     padding: 0.6rem 0.7rem;
@@ -917,11 +922,6 @@ input[type="file"], input[type="range"], input[type="number"], select {
   .summary-text { padding-left: 0.25rem; }
 
   .summary-bar .btn-lg { width: 100%; justify-content: center; }
-
-  .resize-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
 
   .resize-dim-controls { flex-wrap: wrap; }
 
