@@ -773,8 +773,8 @@ window.__initTinySquish = function() {
     html += '</div></div><div class="file-actions">';
     if (fo.status === 'done') html += '<button class="file-btn compare-btn" data-id="' + fo.id + '" title="Compare" aria-label="Compare original and compressed">' + icon('compare') + '</button><button class="file-btn download-btn" data-id="' + fo.id + '" title="Download" aria-label="Download compressed image">' + icon('download') + '</button>';
     html += '<button class="file-btn delete remove-btn" data-id="' + fo.id + '" title="Remove" aria-label="Remove image">' + icon('close') + '</button></div>';
-    if (fo.status === 'compressing') html += '<div class="file-progress" style="width:60%"></div>';
-    if (fo.status === 'done') html += '<div class="file-progress" style="width:100%;background:var(--success);"></div>';
+    if (fo.status === 'compressing') html += '<div class="file-progress indeterminate"></div>';
+    if (fo.status === 'done') html += '<div class="file-progress" style="width:100%"></div>';
     el.innerHTML = html;
 
     // Event delegation

@@ -49,6 +49,12 @@ body {
 /* Form controls don't inherit the page font by default (they fell back to Arial) */
 button, input, select { font: inherit; }
 
+/* Visible keyboard focus everywhere (mouse clicks don't trigger :focus-visible on buttons) */
+:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
 input[type="file"], input[type="range"], input[type="number"], select {
   -webkit-user-select: auto;
   user-select: auto;
@@ -231,7 +237,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s var(--ease);
+  transition: background-color 0.15s var(--ease), color 0.15s var(--ease), border-color 0.15s var(--ease), transform 0.15s var(--ease);
   background: var(--green);
   color: white;
   min-height: 44px;
@@ -395,7 +401,6 @@ input[type="file"], input[type="range"], input[type="number"], select {
 
 .format-select:focus {
   border-color: var(--green);
-  outline: none;
 }
 
 /* ===== BUTTONS ===== */
@@ -406,7 +411,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s var(--ease);
+  transition: background-color 0.15s var(--ease), color 0.15s var(--ease), border-color 0.15s var(--ease), transform 0.15s var(--ease);
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
@@ -486,7 +491,6 @@ input[type="file"], input[type="range"], input[type="number"], select {
 
 .dim-input:focus {
   border-color: var(--green);
-  outline: none;
 }
 
 .dim-input::placeholder {
@@ -505,7 +509,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.15s;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
   padding: 0;
 }
 
@@ -620,6 +624,17 @@ input[type="file"], input[type="range"], input[type="number"], select {
   transition: width 0.4s ease;
 }
 
+/* Real progress isn't known mid-encode, so show an honest indeterminate bar */
+.file-progress.indeterminate {
+  width: 35%;
+  animation: progressSlide 1.1s ease-in-out infinite;
+}
+
+@keyframes progressSlide {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
+}
+
 .file-actions {
   display: flex;
   gap: 0.3rem;
@@ -636,7 +651,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
   align-items: center;
   justify-content: center;
   font-size: 0.85rem;
-  transition: all 0.15s var(--ease);
+  transition: background-color 0.15s var(--ease), color 0.15s var(--ease), border-color 0.15s var(--ease), transform 0.15s var(--ease);
   background: var(--bg);
   color: var(--text-2);
 }
@@ -764,7 +779,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.15s;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
   flex-shrink: 0;
 }
 
@@ -1011,4 +1026,13 @@ input[type="file"], input[type="range"], input[type="number"], select {
   margin-top: 0.4rem;
   max-width: 360px;
   font-size: 0.9rem;
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
