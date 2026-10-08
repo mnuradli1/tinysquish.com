@@ -22,7 +22,7 @@ window.__initTinySquish = function() {
     '<main class="container">',
     '<div class="drop-zone" id="dropZone">',
     '<span class="drop-zone-icon">\uD83D\uDDBC\uFE0F</span>',
-    '<h2>Drop images here</h2>',
+    '<h2><span class="dz-title-empty">Drop images here</span><span class="dz-title-more">Add more images</span></h2>',
     '<p>or choose from your device</p>',
     '<div class="browse-buttons">',
     '<button class="browse-btn" id="btnChooseFiles">Choose Files</button>',
@@ -731,6 +731,8 @@ window.__initTinySquish = function() {
     var fileList = document.getElementById('fileList');
     state.files.length > 0 ? optionsBar.classList.add('visible') : optionsBar.classList.remove('visible');
     state.files.length > 0 ? resizePanel.classList.add('visible') : resizePanel.classList.remove('visible');
+    // Once files are in, the drop zone shrinks to one row so results move up
+    dropZone.classList.toggle('compact', state.files.length > 0);
     if (!state.files.length) document.getElementById('summaryBar').classList.remove('visible');
     fileList.innerHTML = '';
     state.files.forEach(function(f) { fileList.appendChild(createFileEl(f)); });

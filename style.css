@@ -179,6 +179,25 @@ input[type="file"], input[type="range"], input[type="number"], select {
   font-size: 0.85rem;
 }
 
+.dz-title-more { display: none; }
+
+.drop-zone.compact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0.75rem 0.75rem 1.25rem;
+  text-align: left;
+}
+
+.drop-zone.compact .drop-zone-icon,
+.drop-zone.compact p { display: none; }
+
+.drop-zone.compact h2 { font-size: 0.95rem; margin: 0; }
+.drop-zone.compact .dz-title-empty { display: none; }
+.drop-zone.compact .dz-title-more { display: inline; }
+.drop-zone.compact .browse-buttons { margin-top: 0; flex-wrap: nowrap; }
+
 .browse-buttons {
   display: flex;
   gap: 0.5rem;
@@ -855,6 +874,10 @@ input[type="file"], input[type="range"], input[type="number"], select {
   .container { padding: 1rem 0.75rem 3rem; }
 
   .drop-zone { padding: 2rem 1rem; }
+  .drop-zone.compact { padding: 0.6rem; }
+  .drop-zone.compact h2 { display: none; }
+  .drop-zone.compact .browse-buttons { flex: 1; }
+  .drop-zone.compact .browse-btn { flex: 1; }
   .drop-zone-icon { font-size: 2rem; }
 
   .options-bar {
