@@ -24,8 +24,17 @@
 }
 
 /* ===== BASE ===== */
+/* Self-hosted (OFL, fonts/OFL.txt): no third-party request, cached by the SW for offline use */
+@font-face {
+  font-family: 'DM Sans';
+  src: url('fonts/dm-sans.woff2') format('woff2');
+  font-weight: 100 1000;
+  font-style: normal;
+  font-display: swap;
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-family: 'DM Sans', system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
   line-height: 1.55;
@@ -36,6 +45,9 @@ body {
   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;
 }
+
+/* Form controls don't inherit the page font by default (they fell back to Arial) */
+button, input, select { font: inherit; }
 
 input[type="file"], input[type="range"], input[type="number"], select {
   -webkit-user-select: auto;
@@ -123,7 +135,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
 
 .brand-tagline {
   color: var(--text-3);
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   margin-top: 0.2rem;
 }
 
@@ -176,7 +188,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
 
 .drop-zone p {
   color: var(--text-2);
-  font-size: 0.85rem;
+  font-size: 0.95rem;
 }
 
 .dz-title-more { display: none; }
@@ -210,7 +222,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
   padding: 0.55rem 1.4rem;
   border: none;
   border-radius: var(--radius-pill);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s var(--ease);
@@ -240,7 +252,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
 
 .formats-hint {
   margin-top: 0.75rem;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: var(--text-3);
 }
 
@@ -272,7 +284,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-2);
 }
@@ -287,7 +299,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
 }
 
 .option-group label {
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-2);
   white-space: nowrap;
@@ -304,7 +316,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
 .list-header.visible { display: flex; }
 
 .list-count {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--text-2);
 }
@@ -342,7 +354,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
 }
 
 .quality-value {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--green);
   min-width: 30px;
@@ -354,7 +366,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
   padding: 0.35rem 0.6rem;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: 500;
   color: var(--text);
   background: var(--surface);
@@ -372,7 +384,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
   padding: 0.45rem 1rem;
   border: none;
   border-radius: var(--radius-pill);
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s var(--ease);
@@ -407,7 +419,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
 
 /* ===== RESIZE CONTROLS ===== */
 .resize-preview {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--green);
   white-space: nowrap;
@@ -437,7 +449,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
   padding: 0.3rem 0.5rem;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--text);
   background: var(--surface);
@@ -482,7 +494,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
 }
 
 .file-dims {
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   color: var(--text-3);
   white-space: nowrap;
 }
@@ -535,7 +547,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
 
 .file-name {
   font-weight: 600;
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
@@ -543,11 +555,12 @@ input[type="file"], input[type="range"], input[type="number"], select {
 }
 
 .file-meta {
+  font-variant-numeric: tabular-nums;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin-top: 0.15rem;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: var(--text-2);
   flex-wrap: wrap;
 }
@@ -562,7 +575,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
 .file-savings {
   padding: 0.1rem 0.4rem;
   border-radius: var(--radius-pill);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   font-weight: 700;
 }
 
@@ -618,7 +631,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
 }
 
 .file-status {
-  font-size: 0.73rem;
+  font-size: 0.85rem;
   color: var(--text-3);
   font-weight: 500;
 }
@@ -711,7 +724,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
 }
 
 .modal-header h3 {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
@@ -798,7 +811,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
   display: flex;
   justify-content: space-between;
   padding: 0.6rem 1.25rem;
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   color: var(--text-2);
   border-top: 1px solid var(--border);
 }
@@ -811,7 +824,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
   text-align: center;
   padding: 1.5rem 1rem;
   color: var(--text-3);
-  font-size: 0.72rem;
+  font-size: 0.8rem;
 }
 
 .footer .visitor-count {
@@ -864,7 +877,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
 .toast {
   padding: 0.6rem 1rem;
   border-radius: var(--radius-sm);
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: white;
   box-shadow: var(--shadow-lg);
