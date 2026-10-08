@@ -107,16 +107,15 @@ server {
 
 ### Langkah Deploy
 
+Di VPS ini (repo di `~/projects/tinysquish.com`, web root `/var/www/tinysquish.com`):
+
 ```bash
-# 1. Upload file ke VPS
-scp -r vps-version/* user@your-vps:/var/www/tinysquish/
-
-# 2. Set permission
-ssh user@your-vps "chmod -R 755 /var/www/tinysquish"
-
-# 3. Restart web server
-ssh user@your-vps "sudo systemctl restart nginx"
+deploy/deploy.sh                      # backup → salin → cek live == repo → test regresi ke live
+deploy/deploy.sh --no-test            # tanpa test browser
+deploy/deploy.sh --rollback <file.tgz> # pulihkan backup (/var/backups/tinysquish/)
 ```
+
+Script menolak deploy kalau working tree kotor, jadi yang live selalu bisa ditelusuri ke satu commit.
 
 ---
 
