@@ -879,7 +879,8 @@ input[type="file"], input[type="range"], input[type="number"], select {
   color: rgba(0,0,0,0.04);
   padding: 0.4rem;
   pointer-events: none;
-  z-index: 9999;
+  /* Behind cards, modal and the sticky bar: brands empty background, never paints over UI */
+  z-index: -1;
   font-weight: 700;
   letter-spacing: 3px;
   text-transform: uppercase;

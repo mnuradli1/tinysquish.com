@@ -128,7 +128,7 @@ window.__initTinySquish = function() {
     '</div>',
     '</div>',
     '<div class="toast-container" id="toastContainer" role="status" aria-live="polite"></div>',
-    '<footer class="footer"><p>\uD83D\uDC3C TinySquish \u2014 100% local processing, zero uploads</p>',
+    '<footer class="footer"><p>\uD83D\uDC3C TinySquish \u00B7 Works offline after your first visit</p>',
     '<p class="visitor-count" id="visitorCount" hidden></p></footer>',
     '<div class="devtools-warning" id="devtoolsWarning">',
     '<div style="font-size:2.5rem">\uD83D\uDEE1\uFE0F</div>',
