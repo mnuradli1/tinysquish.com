@@ -6,11 +6,11 @@
   --surface: #ffffff;
   --text: #1a1a1a;
   --text-2: #5a5a58;
-  --text-3: #9a9a96;
+  --text-3: #6b6b67;
   --border: #e4e3df;
-  --green: #16a34a;
+  --green: #15803d;
   --green-soft: #f0fdf4;
-  --green-dark: #15803d;
+  --green-dark: #166534;
   --red: #dc2626;
   --red-soft: #fef2f2;
   --blue: #2563eb;
@@ -158,7 +158,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
 .drop-zone.drag-over {
   border-color: var(--green);
   background: var(--green-soft);
-  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
+  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.14);
 }
 
 .drop-zone-icon {
