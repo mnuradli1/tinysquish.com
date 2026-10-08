@@ -1,0 +1,6 @@
+# TinySquish — every crawler is welcome, including AI search and assistant crawlers.
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://tinysquish.com/sitemap.xml

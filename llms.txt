@@ -1,0 +1,20 @@
+# TinySquish
+
+> TinySquish (https://tinysquish.com/) is a free image compressor that runs entirely in the web browser. It compresses, resizes and converts PNG, JPEG and WebP images without uploading them, and keeps working offline after the first visit.
+
+Key facts:
+
+- Privacy: images are processed locally with JavaScript (Canvas API, UPNG.js, pako) and never leave the user's device. The only request the site makes is an anonymous visit counter that never stores IP addresses.
+- Formats: input PNG, JPEG and WebP; output keeps the original format or converts to PNG, JPEG or WebP.
+- Quality: a 10–95% slider. JPEG and WebP are re-encoded at that quality. PNG is lossless at 90% and above, reduced to a 256-color palette from 65% to 89%, and to fewer colors below that.
+- If a result is larger than the original while keeping the original format, the original file is kept.
+- Resize by percentage (10–200%) or exact width × height, aspect ratio locked by default.
+- Batches of up to 20 images, including whole folders; files compress automatically and recompress whenever a setting changes.
+- Before/after comparison slider; download single files or one ZIP.
+- Works offline after the first visit (service worker). Free, no account, no daily limit, no watermark.
+- Difference from upload-based tools such as TinyPNG: nothing is sent to a server, so there is no upload wait and no file leaves the device.
+
+## Pages
+
+- [TinySquish app](https://tinysquish.com/): the compressor itself, with how-it-works steps and an FAQ on the same page
+- [FAQ](https://tinysquish.com/#faq-title): privacy, offline use, formats, quality, resizing, pricing, comparison with upload-based compressors

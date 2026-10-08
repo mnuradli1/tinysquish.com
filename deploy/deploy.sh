@@ -13,7 +13,9 @@ WEBROOT="${WEBROOT:-/var/www/tinysquish.com}"
 SITE_URL="${SITE_URL:-https://tinysquish.com/}"
 BACKUP_DIR="${BACKUP_DIR:-/var/backups/tinysquish}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-FILES=(index.html style.css loader.js app.js sw.js UPNG.js pako.min.js favicon.svg fonts/dm-sans.woff2 fonts/OFL.txt)
+FILES=(index.html style.css loader.js app.js sw.js UPNG.js pako.min.js favicon.svg fonts/dm-sans.woff2 fonts/OFL.txt
+       robots.txt sitemap.xml llms.txt manifest.json og-image.png favicon.ico
+       icons/icon-192.png icons/icon-512.png icons/icon-maskable-512.png icons/apple-touch-icon.png)
 
 die() { echo "deploy: $*" >&2; exit 1; }
 
@@ -59,6 +61,7 @@ done
 [ "$bad" = 0 ] || die "live files differ from the repo; rollback: $0 --rollback $archive"
 
 if [ "$RUN_TESTS" = 1 ]; then
+  python3 tests/seo-check.py "$SITE_URL" || die "SEO checks failed on live; rollback: $0 --rollback $archive"
   TINYSQUISH_URL="$SITE_URL" NODE_PATH="${NODE_PATH:-$HOME/node_modules}" node tests/browser-regressions.js \
     || die "regression tests failed on live; rollback: $0 --rollback $archive"
 fi

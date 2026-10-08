@@ -1,0 +1,15 @@
+{
+  "name": "TinySquish — Offline Image Compressor",
+  "short_name": "TinySquish",
+  "description": "Compress, resize and convert PNG, JPEG and WebP images in your browser. Works offline; images are never uploaded.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f6f5f1",
+  "theme_color": "#f6f5f1",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
