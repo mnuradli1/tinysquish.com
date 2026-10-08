@@ -11,6 +11,23 @@ window.__initTinySquish = function() {
   if (window.location.protocol === 'file:') return;
 
   // ===== INJECT APP HTML =====
+  // ===== ICONS =====
+  // Inline stroke icons: render the same on every OS (emoji didn't) and follow currentColor
+  var ICON_PATHS = {
+    image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>',
+    folder: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+    compare: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M12 3v18"/>',
+    download: '<path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/>',
+    close: '<path d="M6 6l12 12M18 6 6 18"/>',
+    lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+    unlock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.5-2"/>',
+    drag: '<path d="m9 8-4 4 4 4M15 8l4 4-4 4"/>'
+  };
+  function icon(name, size) {
+    size = size || 18;
+    return '<svg class="icon" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON_PATHS[name] + '</svg>';
+  }
+
   var root = document.getElementById('app-root');
   root.innerHTML = '';
 
@@ -21,12 +38,12 @@ window.__initTinySquish = function() {
     '</header>',
     '<main class="container">',
     '<div class="drop-zone" id="dropZone">',
-    '<span class="drop-zone-icon">\uD83D\uDDBC\uFE0F</span>',
+    '<span class="drop-zone-icon">' + icon('image', 40) + '</span>',
     '<h2><span class="dz-title-empty">Drop images here</span><span class="dz-title-more">Add more images</span></h2>',
     '<p>or choose from your device</p>',
     '<div class="browse-buttons">',
     '<button class="browse-btn" id="btnChooseFiles">Choose Files</button>',
-    '<button class="browse-btn browse-btn-folder" id="btnChooseFolder">\uD83D\uDCC2 Folder</button>',
+    '<button class="browse-btn browse-btn-folder" id="btnChooseFolder">' + icon('folder', 16) + ' Folder</button>',
     '</div>',
     '<p class="formats-hint">PNG, JPEG, WebP \u2022 Up to 20 images</p>',
     '<input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" multiple>',
@@ -72,7 +89,7 @@ window.__initTinySquish = function() {
     '<input type="number" class="dim-input" id="resizeHeight" min="1" max="99999" placeholder="Height">',
     '</div>',
     '<div class="option-group">',
-    '<button class="btn-lock" id="aspectLockBtn" title="Lock aspect ratio" aria-label="Lock aspect ratio">\uD83D\uDD12</button>',
+    '<button class="btn-lock" id="aspectLockBtn" title="Lock aspect ratio" aria-label="Lock aspect ratio" aria-pressed="true">' + icon('lock', 16) + '</button>',
     '</div>',
     '</div>',
     '<span class="resize-preview" id="resizePreview"></span>',
@@ -95,14 +112,14 @@ window.__initTinySquish = function() {
     '<div class="modal">',
     '<div class="modal-header">',
     '<h3 id="modalTitle">Before / After</h3>',
-    '<button class="modal-close" id="modalCloseBtn">\u2715</button>',
+    '<button class="modal-close" id="modalCloseBtn" aria-label="Close comparison">' + icon('close', 18) + '</button>',
     '</div>',
     '<div class="comparison-container" id="comparisonContainer">',
     '<img id="compressedPreview" src="" alt="Compressed">',
     '<div class="comparison-original" id="comparisonOriginal">',
     '<img id="originalPreview" src="" alt="Original">',
     '</div>',
-    '<div class="comparison-slider" id="comparisonSlider"></div>',
+    '<div class="comparison-slider" id="comparisonSlider"><span class="comparison-handle">' + icon('drag', 16) + '</span></div>',
     '</div>',
     '<div class="comparison-labels">',
     '<span>Original <span class="size" id="modalOriginalSize"></span></span>',
@@ -716,7 +733,8 @@ window.__initTinySquish = function() {
 
   aspectLockBtn.addEventListener('click', function() {
     resizeState.aspectLocked = !resizeState.aspectLocked;
-    this.textContent = resizeState.aspectLocked ? '\uD83D\uDD12' : '\uD83D\uDD13';
+    this.innerHTML = icon(resizeState.aspectLocked ? 'lock' : 'unlock', 16);
+    this.setAttribute('aria-pressed', String(resizeState.aspectLocked));
     this.title = resizeState.aspectLocked ? 'Lock aspect ratio' : 'Unlock aspect ratio';
   });
 
@@ -754,8 +772,8 @@ window.__initTinySquish = function() {
     if (fo.status === 'error') html += '<span class="file-status error">Error</span>';
     if (fo.status === 'pending') html += '<span class="file-status">Waiting\u2026</span>';
     html += '</div></div><div class="file-actions">';
-    if (fo.status === 'done') html += '<button class="file-btn compare-btn" data-id="' + fo.id + '" title="Compare" aria-label="Compare original and compressed">\uD83D\uDD0D</button><button class="file-btn download-btn" data-id="' + fo.id + '" title="Download" aria-label="Download compressed image">\u2B07\uFE0F</button>';
-    html += '<button class="file-btn delete remove-btn" data-id="' + fo.id + '" title="Remove" aria-label="Remove image">\u2715</button></div>';
+    if (fo.status === 'done') html += '<button class="file-btn compare-btn" data-id="' + fo.id + '" title="Compare" aria-label="Compare original and compressed">' + icon('compare') + '</button><button class="file-btn download-btn" data-id="' + fo.id + '" title="Download" aria-label="Download compressed image">' + icon('download') + '</button>';
+    html += '<button class="file-btn delete remove-btn" data-id="' + fo.id + '" title="Remove" aria-label="Remove image">' + icon('close') + '</button></div>';
     if (fo.status === 'compressing') html += '<div class="file-progress" style="width:60%"></div>';
     if (fo.status === 'done') html += '<div class="file-progress" style="width:100%;background:var(--success);"></div>';
     el.innerHTML = html;
@@ -812,7 +830,7 @@ window.__initTinySquish = function() {
       .then(function(d) {
         try { sessionStorage.setItem('ts_counted', '1'); } catch(e) {}
         var fmt = function(n) { return Number(n).toLocaleString('en-US'); };
-        el.textContent = '👀 ' + fmt(d.total) + ' visitor' + (d.total === 1 ? '' : 's') + ' · ' + fmt(d.today) + ' today';
+        el.textContent = fmt(d.total) + ' visitor' + (d.total === 1 ? '' : 's') + ' · ' + fmt(d.today) + ' today';
         el.hidden = false;
       })
       .catch(function() {}); // offline or API down: keep the counter hidden
