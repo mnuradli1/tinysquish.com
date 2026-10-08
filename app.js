@@ -127,7 +127,7 @@ window.__initTinySquish = function() {
     '</div>',
     '</div>',
     '</div>',
-    '<div class="toast-container" id="toastContainer"></div>',
+    '<div class="toast-container" id="toastContainer" role="status" aria-live="polite"></div>',
     '<footer class="footer"><p>\uD83D\uDC3C TinySquish \u2014 100% local processing, zero uploads</p>',
     '<p class="visitor-count" id="visitorCount" hidden></p></footer>',
     '<div class="devtools-warning" id="devtoolsWarning">',
@@ -239,7 +239,7 @@ window.__initTinySquish = function() {
         if (entry) entries.push(entry);
       }
       if (entries.some(function(e) { return e.isDirectory; })) {
-        toast('Scanning folder for images...', 'info');
+        toast('Scanning folder for images\u2026', 'info');
       }
       for (var j = 0; j < entries.length; j++) {
         var files = await getAllFilesFromEntry(entries[j]);
@@ -306,7 +306,6 @@ window.__initTinySquish = function() {
       img.src = fo.originalUrl;
     });
     updateUI();
-    toast('Added ' + toAdd.length + ' image' + (toAdd.length > 1 ? 's' : ''), 'success');
     runQueue();
   }
 
@@ -613,7 +612,7 @@ window.__initTinySquish = function() {
   document.getElementById('downloadAllBtn').addEventListener('click', async function() {
     var compressed = state.files.filter(function(f) { return f.status === 'done'; });
     if (!compressed.length) return;
-    toast('Building ZIP...', 'info');
+    toast('Building ZIP\u2026', 'info');
     try {
       var zipBlob = await buildZip(compressed);
       var a = document.createElement('a');
