@@ -49,7 +49,7 @@ self.addEventListener('fetch', function(event) {
   // Never intercept the API (POST can't be cached; counts must be live)
   if (event.request.method !== 'GET' || url.pathname.startsWith('/api/')) return;
 
-  // loader.js appends ?v=<timestamp> to scripts; key the cache by path only,
+  // Key the cache by path only (any query string is ignored),
   // otherwise every visit adds new entries and offline lookups never hit.
   const cacheKey = url.origin + url.pathname;
 

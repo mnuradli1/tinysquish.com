@@ -116,7 +116,7 @@
 
   // ===== SERVICE WORKER REGISTRATION =====
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(function() {
+    navigator.serviceWorker.register('/sw.js').catch(function() {
       // SW registration failed — app still works without it
     });
   }
@@ -138,7 +138,9 @@
 
     function loadScript(src, onDone) {
       var s = document.createElement('script');
-      s.src = src + '?v=' + Date.now();
+      // Absolute so landing pages in subfolders load the same files; freshness comes from
+      // nginx's Cache-Control: no-cache + ETag revalidation instead of a per-visit cache-buster
+      s.src = '/' + src;
       s.onload = onDone;
       s.onerror = showError;
       document.body.appendChild(s);

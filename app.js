@@ -10,6 +10,63 @@ window.__initTinySquish = function() {
   // Prevent running from saved local copies
   if (window.location.protocol === 'file:') return;
 
+  // ===== I18N =====
+  // UI language follows <html lang>; pages under /id/ get Indonesian.
+  var LANG = document.documentElement.lang === 'id' ? 'id' : 'en';
+  var STRINGS = {
+    en: {
+      dropTitle: 'Drop images here', dropMore: 'Add more images', orChoose: 'or choose from your device',
+      chooseFiles: 'Choose Files', folder: 'Folder', formatsHint: 'PNG, JPEG, WebP \u2022 Up to 20 images',
+      settings: 'Output settings', quality: 'Quality', pngLossless: ' \u00B7 PNG lossless',
+      format: 'Format', keepOriginal: 'Keep original', maxSize: 'Max size', noLimit: 'No limit',
+      resize: 'Resize', off: 'Off', byPercent: 'By percentage', byDims: 'By dimensions', scale: 'Scale',
+      w: 'W', h: 'H', width: 'Width', height: 'Height', lock: 'Lock aspect ratio', unlock: 'Unlock aspect ratio',
+      clearAll: 'Clear all', images: function(n) { return n + ' image' + (n === 1 ? '' : 's'); },
+      smaller: 'smaller', larger: 'larger', downloadAll: 'Download all', compressing: 'Compressing\u2026',
+      waiting: 'Waiting\u2026', error: 'Error', beforeAfter: 'Before / After', closeCompare: 'Close comparison',
+      original: 'Original', compressed: 'Compressed', compare: 'Compare', compareAria: 'Compare original and compressed',
+      download: 'Download', downloadAria: 'Download compressed image', remove: 'Remove', removeAria: 'Remove image',
+      clickCompare: 'Click to compare', targetMissed: function(t) { return 'Couldn\u2019t reach ' + t; },
+      devtoolsTitle: 'Developer Tools Detected', devtoolsBody: 'Please close Developer Tools to continue using TinySquish.',
+      scanning: 'Scanning folder for images\u2026', noneFound: 'No supported images found.',
+      noneInFolder: 'No supported images found in this folder.', noneSupported: 'No supported images found. Use PNG, JPEG, or WebP.',
+      max20: 'Maximum 20 images. Remove some first.',
+      onlyAdded: function(r, n) { return 'Only added ' + r + ' of ' + n + ' (max 20).'; },
+      cleared: function(n) { return 'Cleared ' + n + ' image' + (n === 1 ? '' : 's'); }, undo: 'Undo',
+      failed: function(name) { return 'Failed to compress ' + name; }, buildingZip: 'Building ZIP\u2026',
+      zipDone: 'ZIP downloaded!', zipFailed: 'Failed to create ZIP',
+      visitors: function(total, today) { return total + ' visitor' + (total === '1' ? '' : 's') + ' \u00B7 ' + today + ' today'; }
+    },
+    id: {
+      dropTitle: 'Taruh gambar di sini', dropMore: 'Tambah gambar', orChoose: 'atau pilih dari perangkat Anda',
+      chooseFiles: 'Pilih File', folder: 'Folder', formatsHint: 'PNG, JPEG, WebP \u2022 Maksimal 20 gambar',
+      settings: 'Pengaturan hasil', quality: 'Kualitas', pngLossless: ' \u00B7 PNG lossless',
+      format: 'Format', keepOriginal: 'Format asli', maxSize: 'Ukuran maks', noLimit: 'Tanpa batas',
+      resize: 'Ubah ukuran', off: 'Tidak', byPercent: 'Persentase', byDims: 'Dimensi', scale: 'Skala',
+      w: 'L', h: 'T', width: 'Lebar', height: 'Tinggi', lock: 'Kunci rasio aspek', unlock: 'Buka kunci rasio aspek',
+      clearAll: 'Hapus semua', images: function(n) { return n + ' gambar'; },
+      smaller: 'lebih kecil', larger: 'lebih besar', downloadAll: 'Unduh semua', compressing: 'Mengompres\u2026',
+      waiting: 'Menunggu\u2026', error: 'Gagal', beforeAfter: 'Sebelum / Sesudah', closeCompare: 'Tutup perbandingan',
+      original: 'Asli', compressed: 'Hasil', compare: 'Bandingkan', compareAria: 'Bandingkan gambar asli dan hasil',
+      download: 'Unduh', downloadAria: 'Unduh gambar hasil', remove: 'Hapus', removeAria: 'Hapus gambar',
+      clickCompare: 'Klik untuk membandingkan', targetMissed: function(t) { return 'Tidak bisa mencapai ' + t; },
+      devtoolsTitle: 'Developer Tools Terdeteksi', devtoolsBody: 'Tutup Developer Tools untuk lanjut memakai TinySquish.',
+      scanning: 'Memindai folder\u2026', noneFound: 'Tidak ada gambar yang didukung.',
+      noneInFolder: 'Tidak ada gambar yang didukung di folder ini.', noneSupported: 'Tidak ada gambar yang didukung. Gunakan PNG, JPEG, atau WebP.',
+      max20: 'Maksimal 20 gambar. Hapus beberapa dulu.',
+      onlyAdded: function(r, n) { return 'Hanya ' + r + ' dari ' + n + ' yang ditambahkan (maks 20).'; },
+      cleared: function(n) { return n + ' gambar dihapus'; }, undo: 'Batalkan',
+      failed: function(name) { return 'Gagal mengompres ' + name; }, buildingZip: 'Membuat ZIP\u2026',
+      zipDone: 'ZIP diunduh!', zipFailed: 'Gagal membuat ZIP',
+      visitors: function(total, today) { return total + ' pengunjung \u00B7 ' + today + ' hari ini'; }
+    }
+  };
+  var T = STRINGS[LANG];
+
+  // Page presets (landing pages set these on <body>): output format and max size in KB
+  var PRESET = { format: document.body.dataset.presetFormat || 'original', maxKb: document.body.dataset.presetMaxKb || '' };
+  var MAX_SIZES = [50, 100, 200, 300, 500, 1000, 2000];
+
   // ===== INJECT APP HTML =====
   // ===== ICONS =====
   // Inline stroke icons: render the same on every OS (emoji didn't) and follow currentColor
@@ -36,57 +93,64 @@ window.__initTinySquish = function() {
     '<div class="container">',
     '<div class="drop-zone" id="dropZone">',
     '<span class="drop-zone-icon">' + icon('image', 40) + '</span>',
-    '<h2><span class="dz-title-empty">Drop images here</span><span class="dz-title-more">Add more images</span></h2>',
-    '<p>or choose from your device</p>',
+    '<h2><span class="dz-title-empty">' + T.dropTitle + '</span><span class="dz-title-more">' + T.dropMore + '</span></h2>',
+    '<p>' + T.orChoose + '</p>',
     '<div class="browse-buttons">',
-    '<button class="browse-btn" id="btnChooseFiles">Choose Files</button>',
-    '<button class="browse-btn browse-btn-folder" id="btnChooseFolder">' + icon('folder', 16) + ' Folder</button>',
+    '<button class="browse-btn" id="btnChooseFiles">' + T.chooseFiles + '</button>',
+    '<button class="browse-btn browse-btn-folder" id="btnChooseFolder">' + icon('folder', 16) + ' ' + T.folder + '</button>',
     '</div>',
-    '<p class="formats-hint">PNG, JPEG, WebP \u2022 Up to 20 images</p>',
+    '<p class="formats-hint">' + T.formatsHint + '</p>',
     '<input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" multiple>',
     '<input type="file" id="folderInput" webkitdirectory multiple>',
     '</div>',
-    '<section class="options-bar" id="optionsBar" aria-label="Output settings">',
+    '<section class="options-bar" id="optionsBar" aria-label="' + T.settings + '">',
     '<div class="setting setting-quality">',
-    '<label for="qualitySlider">Quality <span class="quality-value" id="qualityValue">75%</span></label>',
+    '<label for="qualitySlider">' + T.quality + ' <span class="quality-value" id="qualityValue">75%</span></label>',
     '<input type="range" class="quality-slider" id="qualitySlider" min="10" max="95" value="75">',
     '</div>',
     '<div class="setting">',
-    '<label for="formatSelect">Format</label>',
+    '<label for="formatSelect">' + T.format + '</label>',
     '<select class="format-select" id="formatSelect">',
-    '<option value="original">Keep original</option>',
+    '<option value="original">' + T.keepOriginal + '</option>',
     '<option value="image/jpeg">JPEG</option>',
     '<option value="image/png">PNG</option>',
     '<option value="image/webp">WebP</option>',
     '</select>',
     '</div>',
     '<div class="setting">',
-    '<label for="resizeMode">Resize</label>',
+    '<label for="maxSizeSelect">' + T.maxSize + '</label>',
+    '<select class="format-select" id="maxSizeSelect">',
+    '<option value="">' + T.noLimit + '</option>',
+    MAX_SIZES.map(function(kb) { return '<option value="' + kb + '">' + (kb >= 1000 ? kb / 1000 + ' MB' : kb + ' KB') + '</option>'; }).join(''),
+    '</select>',
+    '</div>',
+    '<div class="setting">',
+    '<label for="resizeMode">' + T.resize + '</label>',
     '<select class="format-select" id="resizeMode">',
-    '<option value="off">Off</option>',
-    '<option value="percent">By percentage</option>',
-    '<option value="dimensions">By dimensions</option>',
+    '<option value="off">' + T.off + '</option>',
+    '<option value="percent">' + T.byPercent + '</option>',
+    '<option value="dimensions">' + T.byDims + '</option>',
     '</select>',
     '</div>',
     '<div class="resize-controls" id="resizeControls">',
     '<div class="resize-percent-controls" id="resizePercentControls">',
     '<div class="option-group">',
-    '<label for="resizePercent">Scale</label>',
+    '<label for="resizePercent">' + T.scale + '</label>',
     '<input type="range" class="quality-slider" id="resizePercent" min="10" max="200" value="50">',
     '<span class="quality-value" id="resizePercentValue">50%</span>',
     '</div>',
     '</div>',
     '<div class="resize-dim-controls" id="resizeDimControls" style="display:none">',
     '<div class="option-group">',
-    '<label for="resizeWidth">W</label>',
-    '<input type="number" class="dim-input" id="resizeWidth" min="1" max="99999" placeholder="Width">',
+    '<label for="resizeWidth">' + T.w + '</label>',
+    '<input type="number" class="dim-input" id="resizeWidth" min="1" max="99999" placeholder="' + T.width + '">',
     '</div>',
     '<div class="option-group">',
-    '<label for="resizeHeight">H</label>',
-    '<input type="number" class="dim-input" id="resizeHeight" min="1" max="99999" placeholder="Height">',
+    '<label for="resizeHeight">' + T.h + '</label>',
+    '<input type="number" class="dim-input" id="resizeHeight" min="1" max="99999" placeholder="' + T.height + '">',
     '</div>',
     '<div class="option-group">',
-    '<button class="btn-lock" id="aspectLockBtn" title="Lock aspect ratio" aria-label="Lock aspect ratio" aria-pressed="true">' + icon('lock', 16) + '</button>',
+    '<button class="btn-lock" id="aspectLockBtn" title="' + T.lock + '" aria-label="' + T.lock + '" aria-pressed="true">' + icon('lock', 16) + '</button>',
     '</div>',
     '</div>',
     '<span class="resize-preview" id="resizePreview"></span>',
@@ -94,41 +158,41 @@ window.__initTinySquish = function() {
     '</section>',
     '<div class="list-header" id="listHeader">',
     '<span class="list-count" id="listCount"></span>',
-    '<button class="btn btn-ghost" id="clearAllBtn">Clear all</button>',
+    '<button class="btn btn-ghost" id="clearAllBtn">' + T.clearAll + '</button>',
     '</div>',
     '<div class="file-list" id="fileList"></div>',
     '<div class="summary-bar" id="summaryBar">',
     '<div class="summary-text">',
-    '<p class="summary-main"><span class="summary-saved" id="summarySaved">0%</span> <span id="summarySavedLabel">smaller</span></p>',
+    '<p class="summary-main"><span class="summary-saved" id="summarySaved">0%</span> <span id="summarySavedLabel">' + T.smaller + '</span></p>',
     '<p class="summary-detail"><span id="summaryOriginal">0 KB</span> \u2192 <span id="summaryCompressed">0 KB</span> \u00B7 <span id="summaryCount">0</span></p>',
     '</div>',
-    '<button class="btn btn-primary btn-lg" id="downloadAllBtn" disabled>Download all</button>',
+    '<button class="btn btn-primary btn-lg" id="downloadAllBtn" disabled>' + T.downloadAll + '</button>',
     '</div>',
     '</div>',
     '<div class="modal-overlay" id="comparisonModal">',
     '<div class="modal">',
     '<div class="modal-header">',
-    '<h3 id="modalTitle">Before / After</h3>',
-    '<button class="modal-close" id="modalCloseBtn" aria-label="Close comparison">' + icon('close', 18) + '</button>',
+    '<h3 id="modalTitle">' + T.beforeAfter + '</h3>',
+    '<button class="modal-close" id="modalCloseBtn" aria-label="' + T.closeCompare + '">' + icon('close', 18) + '</button>',
     '</div>',
     '<div class="comparison-container" id="comparisonContainer">',
-    '<img id="compressedPreview" src="" alt="Compressed">',
+    '<img id="compressedPreview" src="" alt="' + T.compressed + '">',
     '<div class="comparison-original" id="comparisonOriginal">',
-    '<img id="originalPreview" src="" alt="Original">',
+    '<img id="originalPreview" src="" alt="' + T.original + '">',
     '</div>',
     '<div class="comparison-slider" id="comparisonSlider"><span class="comparison-handle">' + icon('drag', 16) + '</span></div>',
     '</div>',
     '<div class="comparison-labels">',
-    '<span>Original <span class="size" id="modalOriginalSize"></span></span>',
-    '<span>Compressed <span class="size" id="modalCompressedSize"></span></span>',
+    '<span>' + T.original + ' <span class="size" id="modalOriginalSize"></span></span>',
+    '<span>' + T.compressed + ' <span class="size" id="modalCompressedSize"></span></span>',
     '</div>',
     '</div>',
     '</div>',
     '<div class="toast-container" id="toastContainer" role="status" aria-live="polite"></div>',
     '<div class="devtools-warning" id="devtoolsWarning">',
     '<div style="font-size:2.5rem">\uD83D\uDEE1\uFE0F</div>',
-    '<h2>Developer Tools Detected</h2>',
-    '<p>Please close Developer Tools to continue using TinySquish.</p>',
+    '<h2>' + T.devtoolsTitle + '</h2>',
+    '<p>' + T.devtoolsBody + '</p>',
     '</div>',
     '<div class="watermark">TINYSQUISH</div>'
   ].join('');
@@ -251,13 +315,13 @@ window.__initTinySquish = function() {
         if (entry) entries.push(entry);
       }
       if (entries.some(function(e) { return e.isDirectory; })) {
-        toast('Scanning folder for images\u2026', 'info');
+        toast(T.scanning, 'info');
       }
       for (var j = 0; j < entries.length; j++) {
         var files = await getAllFilesFromEntry(entries[j]);
         allFiles = allFiles.concat(files);
       }
-      allFiles.length > 0 ? addFiles(allFiles) : toast('No supported images found.', 'error');
+      allFiles.length > 0 ? addFiles(allFiles) : toast(T.noneFound, 'error');
     } else {
       var dropped = Array.from(e.dataTransfer.files).filter(function(f) { return f.type.match(/^image\/(png|jpeg|webp)$/); });
       addFiles(dropped);
@@ -277,17 +341,17 @@ window.__initTinySquish = function() {
 
   folderInput.addEventListener('change', function() {
     var files = Array.from(folderInput.files).filter(function(f) { return f.type.match(/^image\/(png|jpeg|webp)$/); });
-    files.length > 0 ? addFiles(files) : toast('No supported images found in this folder.', 'error');
+    files.length > 0 ? addFiles(files) : toast(T.noneInFolder, 'error');
     folderInput.value = '';
   });
 
   // ===== FILE MANAGEMENT =====
   function addFiles(files) {
-    if (!files.length) { toast('No supported images found. Use PNG, JPEG, or WebP.', 'error'); return; }
+    if (!files.length) { toast(T.noneSupported, 'error'); return; }
     var remaining = 20 - state.files.length;
-    if (remaining <= 0) { toast('Maximum 20 images. Remove some first.', 'error'); return; }
+    if (remaining <= 0) { toast(T.max20, 'error'); return; }
     var toAdd = files.slice(0, remaining);
-    if (files.length > remaining) toast('Only added ' + remaining + ' of ' + files.length + ' (max 20).', 'info');
+    if (files.length > remaining) toast(T.onlyAdded(remaining, files.length), 'info');
     toAdd.forEach(function(file) {
       var id = state.nextId++;
       state.files.push({
@@ -342,8 +406,8 @@ window.__initTinySquish = function() {
     var genAtClear = settingsGen;
     state.files = [];
     updateUI();
-    toast('Cleared ' + cleared.length + ' image' + (cleared.length === 1 ? '' : 's'), 'info', {
-      label: 'Undo',
+    toast(T.cleared(cleared.length), 'info', {
+      label: T.undo,
       ms: 6000,
       onClick: function() {
         var merged = cleared.concat(state.files);
@@ -432,101 +496,151 @@ window.__initTinySquish = function() {
     });
   }
 
+  // Draws the image at w×h (multi-step downscale when shrinking); JPEG gets a white background
+  function renderCanvas(img, w, h, mime) {
+    var canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    var ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    if (mime === 'image/jpeg') {
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, w, h);
+    }
+    var natural = w === img.naturalWidth && h === img.naturalHeight;
+    ctx.drawImage(natural ? img : resizeCanvas(img, w, h), 0, 0);
+    return canvas;
+  }
+
+  function usesUpng(mime) { return mime === 'image/png' && typeof UPNG !== 'undefined'; }
+
+  // colors: 0 = lossless, otherwise palette size (UPNG quantization + dithering)
+  function encodePng(canvas, colors) {
+    var rgba = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data.buffer;
+    return new Blob([UPNG.encode([rgba], canvas.width, canvas.height, colors)], { type: 'image/png' });
+  }
+
+  function encodeLossy(canvas, mime, q) {
+    return new Promise(function(resolve, reject) {
+      canvas.toBlob(function(b) { b ? resolve(b) : reject(new Error('encode failed')); }, mime, q);
+    });
+  }
+
+  // Quality slider → PNG palette size: 90–95% lossless, 65–89% 256 colors, below that fewer
+  function pngColorsFor(quality) {
+    return quality >= 0.9 ? 0 : quality >= 0.65 ? 256 : Math.max(16, Math.round(256 * (quality / 0.65)));
+  }
+
+  // Normal mode: encode at the slider quality, with one cheaper retry if the result grew
+  async function encodeAtQuality(canvas, mime, quality, originalSize) {
+    if (usesUpng(mime)) {
+      var colors = pngColorsFor(quality);
+      var blob = encodePng(canvas, colors);
+      if (colors > 0 && blob.size >= originalSize) {
+        var fewer = encodePng(canvas, Math.max(16, Math.round(colors * 0.5)));
+        if (fewer.size < blob.size) blob = fewer;
+      }
+      return blob;
+    }
+    var out = await encodeLossy(canvas, mime, quality);
+    if (out.size >= originalSize) {
+      var lower = await encodeLossy(canvas, mime, Math.max(0.1, quality - 0.15));
+      if (lower.size < out.size) out = lower;
+    }
+    return out;
+  }
+
+  // Max-size mode: the slider quality is the ceiling. Find the best quality that fits; when even
+  // the floor quality is too big, shrink the dimensions and try again.
+  var LOSSY_FLOOR = 0.4;
+  async function encodeToFit(img, w, h, mime, quality, target) {
+    var best = null;
+    for (var attempt = 0; attempt < 8; attempt++) {
+      var canvas = renderCanvas(img, w, h, mime);
+      var fit = null, smallest;
+      if (usesUpng(mime)) {
+        // Palette ladder from the slider's setting down to 32 colors
+        var start = pngColorsFor(quality);
+        var ladder = [start].concat([256, 128, 64, 32].filter(function(c) { return start === 0 || c < start; }));
+        for (var i = 0; i < ladder.length && !fit; i++) {
+          smallest = encodePng(canvas, ladder[i]);
+          if (smallest.size <= target) fit = smallest;
+        }
+      } else {
+        var top = await encodeLossy(canvas, mime, quality);
+        if (top.size <= target) fit = top;
+        else {
+          smallest = await encodeLossy(canvas, mime, LOSSY_FLOOR);
+          if (smallest.size <= target) {
+            // Binary search the highest quality that still fits
+            var lo = LOSSY_FLOOR, hi = quality;
+            fit = smallest;
+            for (var step = 0; step < 6; step++) {
+              var mid = (lo + hi) / 2;
+              var b = await encodeLossy(canvas, mime, mid);
+              if (b.size <= target) { fit = b; lo = mid; } else hi = mid;
+            }
+          }
+        }
+      }
+      if (fit) return { blob: fit, w: w, h: h, ok: true };
+      if (!best || smallest.size < best.blob.size) best = { blob: smallest, w: w, h: h, ok: false };
+      // Size scales roughly with pixel count, so shrink both sides by sqrt of the overshoot
+      var scale = Math.sqrt(target / smallest.size) * 0.92;
+      var nw = Math.max(16, Math.floor(w * scale)), nh = Math.max(16, Math.round(h * nw / w));
+      if (nw === w) break;
+      w = nw; h = nh;
+    }
+    return best;
+  }
+
   async function compressImage(fileObj) {
     var gen = settingsGen;
     var quality = parseInt(document.getElementById('qualitySlider').value) / 100;
     var targetFormat = document.getElementById('formatSelect').value;
     var outputMime = targetFormat === 'original' ? fileObj.file.type : targetFormat;
+    var target = (parseInt(document.getElementById('maxSizeSelect').value) || 0) * 1024;
     fileObj.status = 'compressing';
     updateFileItem(fileObj);
     try {
       var img = await loadImage(fileObj.originalUrl);
       var origW = img.naturalWidth, origH = img.naturalHeight;
-
-      // Store original dimensions for display and aspect ratio
       fileObj._origW = origW;
       fileObj._origH = origH;
 
-      // Calculate resize dimensions
       var w = origW, h = origH;
-      var resized = false;
       if (resizeState.mode !== 'off') {
         resizeState.aspectRatio = origW / origH;
         var dims = calcResizeDims(origW, origH);
         w = dims.w;
         h = dims.h;
-        if (w !== origW || h !== origH) resized = true;
       }
-      fileObj._outW = w;
-      fileObj._outH = h;
 
-      // Create canvas — use multi-step resize if dimensions changed
-      var canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      var ctx = canvas.getContext('2d');
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-      var blob;
-
-      if (outputMime === 'image/png' && typeof UPNG !== 'undefined') {
-        // === PNG: UPNG.js indexed-color quantization (TinyPNG-like) ===
-        ctx.clearRect(0, 0, w, h);
-        if (resized) {
-          var rc = resizeCanvas(img, w, h);
-          ctx.drawImage(rc, 0, 0);
-        } else {
-          ctx.drawImage(img, 0, 0);
-        }
-        var rgba = ctx.getImageData(0, 0, w, h).data.buffer;
-        // Map quality slider to palette color count (0 = lossless in UPNG):
-        // 90–95% → lossless, 65–89% → 256, 50% → 197, 25% → 98, 10% → 39
-        var colors = quality >= 0.9 ? 0 : quality >= 0.65 ? 256 : Math.max(16, Math.round(256 * (quality / 0.65)));
-        var pngData = UPNG.encode([rgba], w, h, colors);
-        blob = new Blob([pngData], { type: 'image/png' });
-
-        // If still bigger, try with fewer colors (never when lossless was requested)
-        if (colors > 0 && blob.size >= fileObj.originalSize) {
-          var fewer = Math.max(16, Math.round(colors * 0.5));
-          var pngData2 = UPNG.encode([rgba], w, h, fewer);
-          var blob2 = new Blob([pngData2], { type: 'image/png' });
-          blob = blob2.size < blob.size ? blob2 : blob;
-        }
+      var blob, missed = false;
+      if (target) {
+        var r = await encodeToFit(img, w, h, outputMime, quality, target);
+        blob = r.blob; w = r.w; h = r.h; missed = !r.ok;
       } else {
-        // === JPEG / WebP (or PNG fallback without UPNG) ===
-        if (outputMime === 'image/jpeg') {
-          ctx.fillStyle = '#FFFFFF';
-          ctx.fillRect(0, 0, w, h);
-        } else {
-          ctx.clearRect(0, 0, w, h);
-        }
-        if (resized) {
-          var rc = resizeCanvas(img, w, h);
-          ctx.drawImage(rc, 0, 0);
-        } else {
-          ctx.drawImage(img, 0, 0);
-        }
-        blob = await new Promise(function(resolve, reject) {
-          canvas.toBlob(function(b) { b ? resolve(b) : reject(new Error('fail')); }, outputMime, quality);
-        });
-
-        // If bigger, retry at lower quality
-        if (blob.size >= fileObj.originalSize) {
-          var blob2 = await new Promise(function(r) {
-            canvas.toBlob(function(b) { r(b); }, outputMime, Math.max(0.1, quality - 0.15));
-          });
-          if (blob2 && blob2.size < blob.size) blob = blob2;
-        }
+        blob = await encodeAtQuality(renderCanvas(img, w, h, outputMime), outputMime, quality, fileObj.originalSize);
       }
+      var resized = w !== origW || h !== origH;
 
-      // Final safety: never return a file bigger than the original (skip if resized)
-      if (!resized && blob.size >= fileObj.originalSize && targetFormat === 'original') {
+      // Never return a file bigger than the original when nothing else was asked for
+      // (same format, same dimensions); with a max size the original also has to fit.
+      if (!resized && targetFormat === 'original' && blob.size >= fileObj.originalSize &&
+          (!target || fileObj.originalSize <= target)) {
         blob = fileObj.file;
+        missed = false;
       }
 
       // Settings changed mid-compression: drop this result, the queue redoes the file
       if (gen !== settingsGen) { fileObj.status = 'pending'; updateFileItem(fileObj); return; }
 
+      fileObj._outW = w;
+      fileObj._outH = h;
+      fileObj._target = target;
+      fileObj._targetMissed = missed;
       fileObj.compressedBlob = blob;
       if (fileObj.compressedUrl) URL.revokeObjectURL(fileObj.compressedUrl);
       fileObj.compressedUrl = URL.createObjectURL(fileObj.compressedBlob);
@@ -535,7 +649,7 @@ window.__initTinySquish = function() {
     } catch(err) {
       if (gen !== settingsGen) { fileObj.status = 'pending'; updateFileItem(fileObj); return; }
       fileObj.status = 'error';
-      toast('Failed to compress ' + fileObj.file.name, 'error');
+      toast(T.failed(fileObj.file.name), 'error');
     }
     updateFileItem(fileObj);
   }
@@ -640,7 +754,7 @@ window.__initTinySquish = function() {
   document.getElementById('downloadAllBtn').addEventListener('click', async function() {
     var compressed = state.files.filter(function(f) { return f.status === 'done'; });
     if (!compressed.length) return;
-    toast('Building ZIP\u2026', 'info');
+    toast(T.buildingZip, 'info');
     try {
       var zipBlob = await buildZip(compressed);
       var a = document.createElement('a');
@@ -650,8 +764,8 @@ window.__initTinySquish = function() {
       // Revoking synchronously can cancel the download in Safari/Firefox — give it time to start
       var zipUrl = a.href;
       setTimeout(function() { URL.revokeObjectURL(zipUrl); }, 60000);
-      toast('ZIP downloaded!', 'success');
-    } catch(err) { toast('Failed to create ZIP', 'error'); }
+      toast(T.zipDone, 'success');
+    } catch(err) { toast(T.zipFailed, 'error'); }
   });
 
   document.getElementById('clearAllBtn').addEventListener('click', clearAll);
@@ -696,10 +810,15 @@ window.__initTinySquish = function() {
   // ===== QUALITY SLIDER =====
   document.getElementById('qualitySlider').addEventListener('input', function(e) {
     // Matches compressImage: PNG output is lossless from 90% up
-    document.getElementById('qualityValue').textContent = e.target.value + '%' + (e.target.value >= 90 ? ' \u00B7 PNG lossless' : '');
+    document.getElementById('qualityValue').textContent = e.target.value + '%' + (e.target.value >= 90 ? T.pngLossless : '');
   });
   document.getElementById('qualitySlider').addEventListener('change', function() { recompressAll(); });
   document.getElementById('formatSelect').addEventListener('change', function() { recompressAll(); });
+  document.getElementById('maxSizeSelect').addEventListener('change', function() { recompressAll(); });
+
+  // Landing-page presets (e.g. /png-to-webp/ picks WebP, /compress-image-to-100kb/ picks 100 KB)
+  if (PRESET.format) document.getElementById('formatSelect').value = PRESET.format;
+  if (PRESET.maxKb) document.getElementById('maxSizeSelect').value = PRESET.maxKb;
 
   // ===== RESIZE CONTROLS =====
   var resizeModeSelect = document.getElementById('resizeMode');
@@ -763,7 +882,7 @@ window.__initTinySquish = function() {
     resizeState.aspectLocked = !resizeState.aspectLocked;
     this.innerHTML = icon(resizeState.aspectLocked ? 'lock' : 'unlock', 16);
     this.setAttribute('aria-pressed', String(resizeState.aspectLocked));
-    this.title = resizeState.aspectLocked ? 'Lock aspect ratio' : 'Unlock aspect ratio';
+    this.title = resizeState.aspectLocked ? T.lock : T.unlock;
   });
 
   // ===== UI RENDERING =====
@@ -772,7 +891,7 @@ window.__initTinySquish = function() {
     var fileList = document.getElementById('fileList');
     state.files.length > 0 ? optionsBar.classList.add('visible') : optionsBar.classList.remove('visible');
     document.getElementById('listHeader').classList.toggle('visible', state.files.length > 0);
-    document.getElementById('listCount').textContent = state.files.length + ' image' + (state.files.length === 1 ? '' : 's');
+    document.getElementById('listCount').textContent = T.images(state.files.length);
     // Once files are in, the drop zone shrinks to one row so results move up
     dropZone.classList.toggle('compact', state.files.length > 0);
     if (!state.files.length) document.getElementById('summaryBar').classList.remove('visible');
@@ -796,12 +915,13 @@ window.__initTinySquish = function() {
       html += '<span class="file-dims">' + fo._origW + '\u00D7' + fo._origH + ' \u2192 ' + fo._outW + '\u00D7' + fo._outH + '</span>';
     }
     if (fo.status === 'done') html += ' <span>\u2192</span> <span class="file-size-compressed">' + formatSize(fo.compressedSize) + '</span> <span class="file-savings ' + sc + '">' + (savings > 0 ? '\u2212' + savings : savings < 0 ? '+' + (-savings) : 0) + '%</span>';
-    if (fo.status === 'compressing') html += '<span class="file-status compressing"><span class="spinner"></span> Compressing...</span>';
-    if (fo.status === 'error') html += '<span class="file-status error">Error</span>';
-    if (fo.status === 'pending') html += '<span class="file-status">Waiting\u2026</span>';
+    if (fo.status === 'done' && fo._targetMissed) html += '<span class="file-status error">' + T.targetMissed(formatSize(fo._target)) + '</span>';
+    if (fo.status === 'compressing') html += '<span class="file-status compressing"><span class="spinner"></span> ' + T.compressing + '</span>';
+    if (fo.status === 'error') html += '<span class="file-status error">' + T.error + '</span>';
+    if (fo.status === 'pending') html += '<span class="file-status">' + T.waiting + '</span>';
     html += '</div></div><div class="file-actions">';
-    if (fo.status === 'done') html += '<button class="file-btn compare-btn" data-id="' + fo.id + '" title="Compare" aria-label="Compare original and compressed">' + icon('compare') + '</button><button class="file-btn download-btn" data-id="' + fo.id + '" title="Download" aria-label="Download compressed image">' + icon('download') + '</button>';
-    html += '<button class="file-btn delete remove-btn" data-id="' + fo.id + '" title="Remove" aria-label="Remove image">' + icon('close') + '</button></div>';
+    if (fo.status === 'done') html += '<button class="file-btn compare-btn" data-id="' + fo.id + '" title="' + T.compare + '" aria-label="' + T.compareAria + '">' + icon('compare') + '</button><button class="file-btn download-btn" data-id="' + fo.id + '" title="' + T.download + '" aria-label="' + T.downloadAria + '">' + icon('download') + '</button>';
+    html += '<button class="file-btn delete remove-btn" data-id="' + fo.id + '" title="' + T.remove + '" aria-label="' + T.removeAria + '">' + icon('close') + '</button></div>';
     if (fo.status === 'compressing') html += '<div class="file-progress indeterminate"></div>';
     if (fo.status === 'done') html += '<div class="file-progress" style="width:100%"></div>';
     el.innerHTML = html;
@@ -813,7 +933,7 @@ window.__initTinySquish = function() {
       el.querySelector('.download-btn').addEventListener('click', function() { downloadFile(fo); });
       el.querySelector('.file-thumb').addEventListener('click', function() { showComparison(fo.id); });
       el.querySelector('.file-thumb').style.cursor = 'pointer';
-      el.querySelector('.file-thumb').title = 'Click to compare';
+      el.querySelector('.file-thumb').title = T.clickCompare;
     }
     return el;
   }
@@ -831,11 +951,11 @@ window.__initTinySquish = function() {
     var totOrig = 0, totComp = 0;
     done.forEach(function(f) { totOrig += f.originalSize; totComp += f.compressedSize; });
     var saved = totOrig > 0 ? Math.round((1 - totComp / totOrig) * 100) : 0;
-    document.getElementById('summaryCount').textContent = done.length + ' image' + (done.length === 1 ? '' : 's');
+    document.getElementById('summaryCount').textContent = T.images(done.length);
     document.getElementById('summaryOriginal').textContent = formatSize(totOrig);
     document.getElementById('summaryCompressed').textContent = formatSize(totComp);
     document.getElementById('summarySaved').textContent = Math.abs(saved) + '%';
-    document.getElementById('summarySavedLabel').textContent = saved < 0 ? 'larger' : 'smaller';
+    document.getElementById('summarySavedLabel').textContent = saved < 0 ? T.larger : T.smaller;
   }
 
   function updateDownloadBtn() {
@@ -843,7 +963,7 @@ window.__initTinySquish = function() {
     var btn = document.getElementById('downloadAllBtn');
     var busy = state.files.some(function(f) { return f.status === 'pending' || f.status === 'compressing'; });
     btn.disabled = busy || !state.files.some(function(f) { return f.status === 'done'; });
-    btn.textContent = busy ? 'Compressing\u2026' : 'Download all';
+    btn.textContent = busy ? T.compressing : T.downloadAll;
   }
 
   // ===== VISITOR COUNTER =====
@@ -853,12 +973,19 @@ window.__initTinySquish = function() {
     var el = document.getElementById('visitorCount');
     var counted = false;
     try { counted = sessionStorage.getItem('ts_counted') === '1'; } catch(e) {}
-    fetch('/api/visits', { method: counted ? 'GET' : 'POST', cache: 'no-store' })
+    // Only the referring site's host name is sent (e.g. "www.google.com"), never the full URL
+    var ref = '';
+    try { ref = document.referrer ? new URL(document.referrer).hostname : ''; } catch(e) {}
+    if (ref === location.hostname) ref = '';
+    fetch('/api/visits', counted ? { cache: 'no-store' } : {
+      method: 'POST', cache: 'no-store', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ref: ref, page: location.pathname })
+    })
       .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function(d) {
         try { sessionStorage.setItem('ts_counted', '1'); } catch(e) {}
-        var fmt = function(n) { return Number(n).toLocaleString('en-US'); };
-        el.textContent = fmt(d.total) + ' visitor' + (d.total === 1 ? '' : 's') + ' · ' + fmt(d.today) + ' today';
+        var fmt = function(n) { return Number(n).toLocaleString(LANG === 'id' ? 'id-ID' : 'en-US'); };
+        el.textContent = T.visitors(fmt(d.total), fmt(d.today));
         el.hidden = false;
       })
       .catch(function() {}); // offline or API down: keep the counter hidden

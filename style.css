@@ -270,7 +270,7 @@ input[type="file"], input[type="range"], input[type="number"], select {
 /* ===== OPTIONS BAR ===== */
 .options-bar {
   display: none;
-  grid-template-columns: 1.4fr 1fr 1fr;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
   gap: 0.75rem 1.25rem;
   background: var(--surface);
   border-radius: var(--radius);
