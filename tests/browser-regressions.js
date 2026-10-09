@@ -40,6 +40,22 @@ async function makePng(page, w, h, seed) {
   return Buffer.from(b64, 'base64');
 }
 
+async function makeImage(page, w, h, mime) {
+  const b64 = await page.evaluate(async ([w, h, mime]) => {
+    const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+    const ctx = cv.getContext('2d'); const id = ctx.createImageData(w, h);
+    for (let i = 0; i < id.data.length; i += 4) {
+      const p = i / 4, x = p % w, y = (p / w) | 0, n = (Math.imul(p, 2654435761) >>> 26) - 32;
+      id.data[i] = (x / w * 255 + n) & 255; id.data[i + 1] = (y / h * 255 + n) & 255; id.data[i + 2] = ((x + y) & 255); id.data[i + 3] = 255;
+    }
+    ctx.putImageData(id, 0, 0);
+    const blob = await new Promise(r => cv.toBlob(r, mime, 0.95));
+    const buf = new Uint8Array(await blob.arrayBuffer());
+    let s = ''; for (const v of buf) s += String.fromCharCode(v); return btoa(s);
+  }, [w, h, mime]);
+  return Buffer.from(b64, 'base64');
+}
+
 async function openApp(browser, init = '') {
   const ctx = await browser.newContext({ acceptDownloads: true, serviceWorkers: 'block' });
   const page = await ctx.newPage();
@@ -225,6 +241,37 @@ async function inspectLastPng(page, origB64) {
       const revoked = await page.evaluate((b) => window.__revoked.length - b, before);
       check('7b. without Undo, blob URLs are revoked after the undo window', revoked >= 6 && !(await page.$('.toast-action')), `revoked=${revoked}`);
       await ctx.close();
+    }
+
+    // ---- Max size: every output fits the target, across input and output formats
+    {
+      const big = await makeImage(scratch, 1600, 1200, 'image/png');     // noisy, ~5 MB PNG
+      const jpg = await makeImage(scratch, 1600, 1200, 'image/jpeg');    // ~1 MB JPEG
+      const small = await makeImage(scratch, 120, 80, 'image/jpeg');     // already tiny
+      for (const [fmt, kb] of [['original', 100], ['image/webp', 50], ['image/png', 200], ['image/jpeg', 100]]) {
+        const { ctx, page } = await openApp(browser);
+        // Settings are hidden until files exist, so preset them directly
+        await page.evaluate(([fmt, kb]) => {
+          for (const [id, v] of [['formatSelect', fmt], ['maxSizeSelect', kb]]) {
+            const el = document.getElementById(id); el.value = v; el.dispatchEvent(new Event('change'));
+          }
+        }, [fmt, String(kb)]);
+        await page.setInputFiles('#fileInput', [{ name: 'big.png', mimeType: 'image/png', buffer: big },
+          { name: 'photo.jpg', mimeType: 'image/jpeg', buffer: jpg }, { name: 'small.jpg', mimeType: 'image/jpeg', buffer: small }]);
+        await page.waitForFunction(() => document.querySelectorAll('.download-btn').length === 3
+          && !document.querySelector('.file-status.compressing, .file-status:not(.error)'), null, { timeout: 60000 });
+        const r = await page.evaluate(() => ({
+          sizes: [...document.querySelectorAll('.file-size-compressed')].map(e => e.textContent),
+          missed: document.querySelectorAll('.file-status.error').length }));
+        const bytes = r.sizes.map(t => parseFloat(t) * (t.includes('MB') ? 1048576 : t.includes('KB') ? 1024 : 1));
+        check(`8. max size ${kb} KB (${fmt}): all outputs fit`, r.missed === 0 && bytes.every(b => b <= kb * 1024), JSON.stringify(r.sizes));
+        if (fmt === 'original') {
+          const orig = await page.$$eval('.file-size-original', els => els.map(e => e.textContent));
+          const ob = orig.map(t => parseFloat(t) * (t.includes('MB') ? 1048576 : t.includes('KB') ? 1024 : 1));
+          check('8b. with max size + keep original, no output is larger than its original', bytes.every((b, i) => b <= ob[i]), JSON.stringify({ orig, out: r.sizes }));
+        }
+        await ctx.close();
+      }
     }
   } finally {
     await browser.close();
