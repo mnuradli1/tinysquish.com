@@ -1,0 +1,27 @@
+{
+  "name": "tinysquish",
+  "version": "0.1.0",
+  "description": "Compress, resize and convert PNG, JPEG and WebP images locally — CLI and MCP server for people and AI agents. Nothing is uploaded.",
+  "keywords": ["image", "compress", "png", "jpeg", "webp", "resize", "cli", "mcp", "model-context-protocol", "offline"],
+  "homepage": "https://tinysquish.com/cli/",
+  "repository": { "type": "git", "url": "git+https://github.com/mnuradli1/tinysquish.com.git" },
+  "bugs": { "url": "https://github.com/mnuradli1/tinysquish.com/issues" },
+  "license": "MIT",
+  "author": "Nur Adli (https://github.com/mnuradli1)",
+  "type": "commonjs",
+  "main": "cli/core.js",
+  "bin": {
+    "tinysquish": "cli/bin/tinysquish.js",
+    "tinysquish-mcp": "cli/bin/tinysquish-mcp.js"
+  },
+  "files": ["cli/core.js", "cli/run.js", "cli/bin/", "skill/", "LICENSE"],
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "node --test cli/test/*.test.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "sharp": "^0.35.5",
+    "zod": "^4.0.0"
+  }
+}
