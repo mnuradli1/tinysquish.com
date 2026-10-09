@@ -123,6 +123,23 @@ input[type="file"], input[type="range"], input[type="number"], select {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-3);
+  margin-top: 0.35rem;
+}
+
+.breadcrumb a { color: var(--text-2); }
+
+.page-lead {
+  max-width: 640px;
+  margin: 0.4rem auto 0;
+  font-size: 0.9rem;
+  color: var(--text-3);
 }
 
 .brand-icon { font-size: 1.75rem; }
@@ -952,6 +969,47 @@ input[type="file"], input[type="range"], input[type="number"], select {
 
 .faq details p { padding: 0 1.25rem 1rem; }
 
+/* Links inside explanatory content: underlined, visited state distinguishable */
+.info a, .page-lead a, .table-note a { color: var(--green); text-underline-offset: 2px; }
+.info a:visited { color: #3f6212; }
+
+.info code {
+  font-size: 0.85em;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.05rem 0.3rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table th, .data-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-2);
+}
+
+.data-table thead th { color: var(--text); font-weight: 600; white-space: nowrap; }
+.data-table td.num { white-space: nowrap; }
+.data-table tbody th { color: var(--text); font-weight: 600; min-width: 9rem; }
+.data-table tr:last-child th, .data-table tr:last-child td { border-bottom: none; }
+
+.table-note { font-size: 0.8rem !important; margin-top: 0.6rem; }
+
 /* ===== FOOTER ===== */
 .footer {
   text-align: center;
@@ -959,6 +1017,24 @@ input[type="file"], input[type="range"], input[type="number"], select {
   color: var(--text-3);
   font-size: 0.8rem;
 }
+
+.footer-nav {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+.footer-heading {
+  font-weight: 700;
+  color: var(--text-2);
+  margin-bottom: 0.4rem;
+}
+
+.footer-nav ul { list-style: none; display: flex; flex-direction: column; gap: 0.15rem; }
+.footer-nav a { color: var(--text-3); text-decoration: none; display: inline-block; padding: 0.15rem 0; }
+.footer-nav a:hover { color: var(--green); text-decoration: underline; }
 
 .footer .visitor-count {
   margin-top: 0.35rem;
@@ -1052,6 +1128,8 @@ input[type="file"], input[type="range"], input[type="number"], select {
 /* ===== RESPONSIVE ===== */
 @media (max-width: 600px) {
   .container { padding: 1rem 0.75rem 0.5rem; }
+  .footer-nav { gap: 1.5rem; flex-wrap: wrap; }
+  .footer-nav a { padding: 0.35rem 0; }
   .info { padding: 0 0.75rem; }
 
   .drop-zone { padding: 2rem 1rem; }

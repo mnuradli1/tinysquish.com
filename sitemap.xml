@@ -1,7 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://tinysquish.com/</loc>
-    <lastmod>2026-10-08</lastmod>
+    <lastmod>2026-10-09</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://tinysquish.com/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://tinysquish.com/id/"/>
+  </url>
+  <url>
+    <loc>https://tinysquish.com/compress-png/</loc>
+    <lastmod>2026-10-09</lastmod>
+  </url>
+  <url>
+    <loc>https://tinysquish.com/compress-jpeg/</loc>
+    <lastmod>2026-10-09</lastmod>
+  </url>
+  <url>
+    <loc>https://tinysquish.com/png-to-webp/</loc>
+    <lastmod>2026-10-09</lastmod>
+  </url>
+  <url>
+    <loc>https://tinysquish.com/jpg-to-webp/</loc>
+    <lastmod>2026-10-09</lastmod>
+  </url>
+  <url>
+    <loc>https://tinysquish.com/compress-image-to-100kb/</loc>
+    <lastmod>2026-10-09</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://tinysquish.com/compress-image-to-100kb/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://tinysquish.com/id/kompres-foto-100kb/"/>
+  </url>
+  <url>
+    <loc>https://tinysquish.com/bulk-image-compressor/</loc>
+    <lastmod>2026-10-09</lastmod>
+  </url>
+  <url>
+    <loc>https://tinysquish.com/tinypng-alternative/</loc>
+    <lastmod>2026-10-09</lastmod>
+  </url>
+  <url>
+    <loc>https://tinysquish.com/benchmark/</loc>
+    <lastmod>2026-10-09</lastmod>
+  </url>
+  <url>
+    <loc>https://tinysquish.com/about/</loc>
+    <lastmod>2026-10-09</lastmod>
+  </url>
+  <url>
+    <loc>https://tinysquish.com/privacy/</loc>
+    <lastmod>2026-10-09</lastmod>
+  </url>
+  <url>
+    <loc>https://tinysquish.com/id/</loc>
+    <lastmod>2026-10-09</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://tinysquish.com/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://tinysquish.com/id/"/>
+  </url>
+  <url>
+    <loc>https://tinysquish.com/id/kompres-foto-100kb/</loc>
+    <lastmod>2026-10-09</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://tinysquish.com/compress-image-to-100kb/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://tinysquish.com/id/kompres-foto-100kb/"/>
   </url>
 </urlset>

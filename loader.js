@@ -124,6 +124,9 @@
   // ===== DYNAMIC CONTENT INJECTION =====
   // Load the actual app after a delay (prevents "Save Page" from capturing content)
   function injectApp() {
+    // Content-only pages (about, privacy, benchmark, 404) have no app slot
+    if (!document.getElementById('app-root')) return;
+
     // Verify we're running from expected origin (not a local file save)
     if (window.location.protocol === 'file:') {
       document.getElementById('app-root').innerHTML = '<div style="text-align:center;padding:4rem;font-family:sans-serif;"><p style="font-size:1.5rem;font-weight:700;">🐼 TinySquish</p><p style="color:#E17055;margin-top:1rem;font-weight:600;">This application cannot run from a local file.</p><p style="color:#636E72;margin-top:0.5rem;">Please access it from the original website.</p></div>';

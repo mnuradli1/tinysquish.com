@@ -1,20 +1,37 @@
 # TinySquish
 
-> TinySquish (https://tinysquish.com/) is a free image compressor that runs entirely in the web browser. It compresses, resizes and converts PNG, JPEG and WebP images without uploading them, and keeps working offline after the first visit.
+> TinySquish (https://tinysquish.com/) is a free, open-source (MIT) image compressor that runs entirely in the web browser. It compresses, resizes and converts PNG, JPEG and WebP images without uploading them, can target a maximum file size, and keeps working offline after the first visit.
 
 Key facts:
 
 - Privacy: images are processed locally with JavaScript (Canvas API, UPNG.js, pako) and never leave the user's device. The only request the site makes is an anonymous visit counter that never stores IP addresses.
-- Formats: input PNG, JPEG and WebP; output keeps the original format or converts to PNG, JPEG or WebP.
+- Formats: input PNG, JPEG and WebP; output keeps the original format or converts to PNG, JPEG or WebP. No AVIF or JPEG XL output.
 - Quality: a 10–95% slider. JPEG and WebP are re-encoded at that quality. PNG is lossless at 90% and above, reduced to a 256-color palette from 65% to 89%, and to fewer colors below that.
+- Max size: 50 KB, 100 KB, 200 KB, 300 KB, 500 KB, 1 MB or 2 MB. The highest quality that fits is chosen; dimensions shrink only when needed.
 - If a result is larger than the original while keeping the original format, the original file is kept.
 - Resize by percentage (10–200%) or exact width × height, aspect ratio locked by default.
-- Batches of up to 20 images, including whole folders; files compress automatically and recompress whenever a setting changes.
-- Before/after comparison slider; download single files or one ZIP.
+- Batches of up to 20 images, including whole folders; results download individually or as one ZIP.
 - Works offline after the first visit (service worker). Free, no account, no daily limit, no watermark.
-- Difference from upload-based tools such as TinyPNG: nothing is sent to a server, so there is no upload wait and no file leaves the device.
+- Benchmark (2026-10-09, Kodak 24-photo suite): WebP 75% was 92.3% smaller than the PNG originals at 35.09 dB PSNR; palette PNG 75% saved 58% on UI screenshots at 58.24 dB. Details: https://tinysquish.com/benchmark/
+- Compared with TinyPNG: TinyPNG processes files on its servers (kept up to 48 hours; free limit 20 images, 5 MB each) and also outputs AVIF, JPEG XL and APNG. Squoosh also runs locally but handles one image at a time.
+- Made by Nur Adli. Source code: https://github.com/mnuradli1/tinysquish.com
 
 ## Pages
 
-- [TinySquish app](https://tinysquish.com/): the compressor itself, with how-it-works steps and an FAQ on the same page
-- [FAQ](https://tinysquish.com/#faq-title): privacy, offline use, formats, quality, resizing, pricing, comparison with upload-based compressors
+- [Compress PNG, JPEG & WebP images in your browser — nothing is uploaded](https://tinysquish.com/): Free image compressor that runs in your browser. Shrink, resize and convert PNG, JPEG and WebP in batches. Works offline; images are never uploaded.
+- [Compress PNG images without uploading them](https://tinysquish.com/compress-png/): Shrink PNG files in your browser with palette quantization, or keep them lossless. Transparency stays intact, nothing is uploaded, and it works offline.
+- [Compress JPEG photos privately in your browser](https://tinysquish.com/compress-jpeg/): Make JPG photos smaller without uploading them. Pick a quality or a target size, compare before and after, and download one file or a ZIP.
+- [Convert PNG to WebP in your browser](https://tinysquish.com/png-to-webp/): Convert PNG images to WebP in your browser and keep transparency. Batch up to 20 files, compare quality, and download a ZIP. Nothing is uploaded.
+- [Convert JPG to WebP without uploading](https://tinysquish.com/jpg-to-webp/): Turn JPG photos into smaller WebP files right in your browser. No upload, no sign-up, batch up to 20 images, with a before/after comparison.
+- [Compress an image to 100 KB or any target size](https://tinysquish.com/compress-image-to-100kb/): Make a photo fit under 100 KB, 200 KB, 500 KB or 1 MB for upload forms. Runs in your browser: no upload, no sign-up, and it works offline.
+- [Compress images in bulk, right in your browser](https://tinysquish.com/bulk-image-compressor/): Compress up to 20 images at once, or a whole folder, in your browser. Same settings for every file, one ZIP download, and nothing is uploaded.
+- [A TinyPNG alternative that keeps your images on your device](https://tinysquish.com/tinypng-alternative/): TinySquish vs TinyPNG vs Squoosh: where your images are processed, offline use, batch limits and formats, compared side by side with sources.
+- [Benchmark: how much smaller, at what quality](https://tinysquish.com/benchmark/): Measured results for TinySquish on the 24-image Kodak photo suite and UI screenshots: size reduction and PSNR for PNG, JPEG, WebP and max-size modes.
+- [About TinySquish](https://tinysquish.com/about/): Who builds TinySquish, how it works under the hood, and how to report a bug or request a feature. Free, open source under the MIT license.
+- [Privacy](https://tinysquish.com/privacy/): Your images never leave your device. Here is exactly what tinysquish.com does collect: an anonymous visit count and standard web server logs.
+- [Kompres foto PNG, JPEG & WebP di browser — tanpa diunggah](https://tinysquish.com/id/): Kompres, ubah ukuran, dan konversi foto PNG, JPEG, dan WebP langsung di browser. Gratis, bisa offline, dan foto Anda tidak pernah diunggah.
+- [Kompres foto ke 100 KB atau ukuran lain](https://tinysquish.com/id/kompres-foto-100kb/): Kecilkan foto di bawah 100 KB, 200 KB, 500 KB, atau 1 MB untuk formulir online. Langsung di browser: tanpa upload, tanpa daftar, bisa offline.
+
+## Data
+
+- [Benchmark results (JSON)](https://tinysquish.com/bench/results.json): per-image sizes and PSNR for every setting
