@@ -68,7 +68,24 @@ Body (adapt per sub): two or three sentences on why, the max-size mode, the benc
 
 Good places: X/Twitter, Facebook groups for job seekers and students, Kaskus (Computer Stuff).
 
-## 7. GitHub
+## 7. CLI & MCP (npm: tinysquish)
+
+The npm package makes TinySquish usable by scripts and AI agents. List it where those users look:
+
+- [ ] Official MCP Registry (https://registry.modelcontextprotocol.io) — publish with the `mcp-publisher` CLI
+      (needs a `server.json` and GitHub login)
+- [ ] MCP directories: Smithery, mcp.so, Glama, PulseMCP — submit https://github.com/mnuradli1/tinysquish.com
+- [ ] "awesome MCP servers" lists on GitHub (category: media / image processing), following each list's rules
+- [ ] Show HN variant: `Show HN: TinySquish – compress images locally from the CLI or any MCP-capable agent`
+
+One-liners to paste:
+
+```
+npx -y tinysquish photo.jpg --max 100kb
+claude mcp add tinysquish -- npx -y -p tinysquish tinysquish-mcp
+```
+
+## 8. GitHub
 
 - Repo description: `Compress PNG, JPEG & WebP in your browser — nothing uploaded. Offline, MIT.`
 - Website field: https://tinysquish.com
