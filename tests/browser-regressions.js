@@ -56,11 +56,11 @@ async function makeImage(page, w, h, mime) {
   return Buffer.from(b64, 'base64');
 }
 
-async function openApp(browser, init = '') {
+async function openApp(browser, init = '', path = '') {
   const ctx = await browser.newContext({ acceptDownloads: true, serviceWorkers: 'block' });
   const page = await ctx.newPage();
   await page.addInitScript(INIT + init);
-  await page.goto(URL_);
+  await page.goto(URL_ + path);
   await page.waitForSelector('#fileInput', { state: 'attached', timeout: 10000 });
   return { ctx, page };
 }
@@ -272,6 +272,39 @@ async function inspectLastPng(page, origB64) {
         }
         await ctx.close();
       }
+    }
+
+    // ---- Landing pages: presets, Indonesian UI, content-only pages
+    {
+      let { ctx, page } = await openApp(browser, '', 'png-to-webp/');
+      await page.setInputFiles('#fileInput', [{ name: 'p.png', mimeType: 'image/png', buffer: pngA }]);
+      await page.waitForFunction(() => document.querySelectorAll('.download-btn').length === 1);
+      const webp = await page.evaluate(() => ({ fmt: document.getElementById('formatSelect').value,
+        out: window.__blobs.filter(b => b.type === 'image/webp').length }));
+      check('9. /png-to-webp/ presets WebP output', webp.fmt === 'image/webp' && webp.out >= 1, JSON.stringify(webp));
+      await ctx.close();
+
+      ({ ctx, page } = await openApp(browser, '', 'compress-image-to-100kb/'));
+      check('9b. /compress-image-to-100kb/ presets Max size 100 KB', await page.$eval('#maxSizeSelect', e => e.value) === '100');
+      await ctx.close();
+
+      ({ ctx, page } = await openApp(browser, '', 'id/kompres-foto-100kb/'));
+      await page.setInputFiles('#fileInput', [{ name: 'p.png', mimeType: 'image/png', buffer: pngA }]);
+      await page.waitForFunction(() => document.querySelectorAll('.download-btn').length === 1);
+      const id = await page.evaluate(() => ({ drop: document.querySelector('.dz-title-more').textContent,
+        count: document.getElementById('listCount').textContent, dl: document.getElementById('downloadAllBtn').textContent,
+        max: document.getElementById('maxSizeSelect').value }));
+      check('10. /id/ pages show the app in Indonesian (+ 100 KB preset)', id.drop === 'Tambah gambar' && id.count === '1 gambar'
+        && id.dl === 'Unduh semua' && id.max === '100', JSON.stringify(id));
+      await ctx.close();
+
+      const errs = [];
+      ctx = await browser.newContext({ serviceWorkers: 'block' });
+      page = await ctx.newPage();
+      page.on('pageerror', e => errs.push(e.message));
+      await page.goto(URL_ + 'about/'); await page.waitForTimeout(800);
+      check('11. content-only page (/about/) loads without JS errors', errs.length === 0 && !(await page.$('#app-root')), JSON.stringify(errs));
+      await ctx.close();
     }
   } finally {
     await browser.close();
