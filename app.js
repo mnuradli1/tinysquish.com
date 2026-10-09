@@ -310,9 +310,15 @@ window.__initTinySquish = function() {
     if (items && items.length > 0 && items[0].webkitGetAsEntry) {
       var allFiles = [];
       var entries = [];
+      // Items must be read synchronously, before the first await. Drags that don't come from
+      // the file system (another tab, some apps) have no entry, only a plain File.
       for (var i = 0; i < items.length; i++) {
         var entry = items[i].webkitGetAsEntry();
         if (entry) entries.push(entry);
+        else {
+          var loose = items[i].kind === 'file' && items[i].getAsFile();
+          if (loose && loose.type.match(/^image\/(png|jpeg|webp)$/)) allFiles.push(loose);
+        }
       }
       if (entries.some(function(e) { return e.isDirectory; })) {
         toast(T.scanning, 'info');
