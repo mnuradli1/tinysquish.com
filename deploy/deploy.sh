@@ -18,7 +18,7 @@ FILES=(index.html style.css loader.js app.js sw.js UPNG.js pako.min.js favicon.s
        icons/icon-192.png icons/icon-512.png icons/icon-maskable-512.png icons/apple-touch-icon.png)
 # IndexNow (Bing, Yandex, Seznam...): the key is public by design, it only proves domain ownership
 INDEXNOW_KEY=14e88c1d684501e42acfa1154a3bcca2
-FILES+=("$INDEXNOW_KEY.txt")
+FILES+=("$INDEXNOW_KEY.txt" 404.html bench/results.json)
 
 die() { echo "deploy: $*" >&2; exit 1; }
 
@@ -46,12 +46,21 @@ cd "$REPO"
 # Only committed code goes live, so a deploy can always be traced to a commit
 [ -z "$(git status --porcelain)" ] || die "working tree is dirty; commit or stash first"
 sha=$(git rev-parse --short HEAD)
+# Generated pages (tools/build-site.py): every */index.html below the repo root
+while IFS= read -r f; do FILES+=("$f"); done < <(find . -mindepth 2 -name index.html -not -path './.git/*' -not -path './node_modules/*' | sed 's|^\./||' | sort)
 for f in "${FILES[@]}"; do [ -f "$f" ] || die "missing $f"; done
 
-page_changed=0
-cmp -s index.html "$WEBROOT/index.html" || page_changed=1
-if [ "$page_changed" = 1 ] && cmp -s sitemap.xml "$WEBROOT/sitemap.xml"; then
-  echo "note: index.html changed but sitemap.xml didn't; consider bumping <lastmod>" >&2
+# The committed HTML must be what the generator produces
+python3 tools/build-site.py >/dev/null
+[ -z "$(git status --porcelain)" ] || die "generated pages are stale: run python3 tools/build-site.py and commit" 
+
+# Pages whose content changed: these URLs are sent to IndexNow after the deploy
+changed_urls=()
+for f in index.html $(printf '%s\n' "${FILES[@]}" | grep '/index.html$'); do
+  cmp -s "$f" "$WEBROOT/$f" || changed_urls+=("${SITE_URL}${f%index.html}")
+done
+if [ "${#changed_urls[@]}" -gt 0 ] && cmp -s sitemap.xml "$WEBROOT/sitemap.xml"; then
+  echo "note: pages changed but sitemap.xml didn't; consider bumping LASTMOD in tools/build-site.py" >&2
 fi
 
 archive=$(backup "$sha")
@@ -75,13 +84,19 @@ if [ "$RUN_TESTS" = 1 ]; then
     || die "regression tests failed on live; rollback: $0 --rollback $archive"
 fi
 
-# Tell IndexNow engines the page changed; only for real content changes, and never fatal
-if [ "$page_changed" = 1 ] && [ "$SITE_URL" = "https://tinysquish.com/" ]; then
+# The visitor counter runs from this repo; restart it so server changes take effect
+if systemctl --user cat tinysquish-visits >/dev/null 2>&1; then
+  systemctl --user restart tinysquish-visits && echo "Restarted tinysquish-visits"
+fi
+
+# Tell IndexNow engines which pages changed; only real content changes, and never fatal
+if [ "${#changed_urls[@]}" -gt 0 ] && [ "$SITE_URL" = "https://tinysquish.com/" ]; then
+  url_json=$(printf '"%s",' "${changed_urls[@]}"); url_json="[${url_json%,}]"
   code=$(curl -s -o /dev/null -w '%{http_code}' -X POST https://api.indexnow.org/indexnow \
     -H 'Content-Type: application/json; charset=utf-8' \
-    -d "{\"host\":\"tinysquish.com\",\"key\":\"$INDEXNOW_KEY\",\"keyLocation\":\"${SITE_URL}$INDEXNOW_KEY.txt\",\"urlList\":[\"$SITE_URL\"]}") || code=000
+    -d "{\"host\":\"tinysquish.com\",\"key\":\"$INDEXNOW_KEY\",\"keyLocation\":\"${SITE_URL}$INDEXNOW_KEY.txt\",\"urlList\":$url_json}") || code=000
   case "$code" in
-    200|202) echo "IndexNow: notified ($code)" ;;
+    200|202) echo "IndexNow: notified ${#changed_urls[@]} URL(s) ($code)" ;;
     *) echo "IndexNow: warning, HTTP $code (deploy is fine; retry later)" >&2 ;;
   esac
 fi
