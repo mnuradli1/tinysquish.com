@@ -74,6 +74,8 @@ async function run(paths, opts = {}, onResult = () => {}) {
       const input = inputs[i];
       let result;
       try {
+        // e.g. the MCP server's --allow check, applied to every file found inside folders too
+        if (opts.checkInput) opts.checkInput(input);
         const r = await compress(fs.readFileSync(input), opts);
         const output = opts.dryRun ? null : outputPath(input, r.format, opts, taken);
         if (output) fs.writeFileSync(output, r.data);
