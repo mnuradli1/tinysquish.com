@@ -19,6 +19,38 @@ and the app keeps working offline after the first visit.
 - **Offline** via a service worker; **no cookies, no third-party analytics**
 - English and Indonesian UI
 
+## CLI, MCP server and agent skill
+
+The same compressor for the terminal, scripts and AI agents. It runs on your machine:
+no upload, no API key, no server. Needs Node.js 20+.
+
+```bash
+npx -y tinysquish photo.jpg --max 100kb          # fit an upload limit
+npx -y tinysquish ./images -f webp -o ./web      # a folder → WebP
+npx -y tinysquish ./shots --json                 # machine-readable results
+npm install -g tinysquish                        # install once, then use offline
+```
+
+Inputs are never modified; results are written as `name-compressed.ext`. See `tinysquish --help`.
+
+**MCP server** (tools `compress_images` and `image_info`, local stdio, no network):
+
+```bash
+claude mcp add tinysquish -- npx -y -p tinysquish tinysquish-mcp
+```
+
+```json
+{ "mcpServers": { "tinysquish": { "command": "npx", "args": ["-y", "-p", "tinysquish", "tinysquish-mcp"] } } }
+```
+
+Add `"--allow", "/path/to/folder"` to the args to restrict which folders it may read and write.
+
+**Agent skill**: [`skill/tinysquish/SKILL.md`](skill/tinysquish/SKILL.md), for Claude Code save it as
+`~/.claude/skills/tinysquish/SKILL.md`. More: [tinysquish.com/cli](https://tinysquish.com/cli/).
+
+The CLI follows the same rules as the web app (quality, lossless PNG from 90%, max size, never larger
+than the original) but encodes with libvips via sharp, so sizes are similar, not byte-identical.
+
 ## How it works
 
 | Format | Encoder |
@@ -38,6 +70,8 @@ tools/
   benchmark.js    reproducible size/PSNR benchmark → bench/results.json
   render-assets.js  renders og-image.png, icons and favicon.ico
   crawler-report.py search/AI crawler activity from the nginx log
+cli/              npm package "tinysquish": core.js, run.js, bin/tinysquish(-mcp).js, tests
+skill/            agent skill (SKILL.md)
 server/visits.py  tiny anonymous visit counter (stdlib + SQLite, no raw IPs stored)
 deploy/           nginx config, systemd unit, deploy.sh
 tests/            browser regression tests (Playwright) and SEO checks
@@ -62,6 +96,7 @@ NODE_PATH=~/node_modules node tests/browser-regressions.js   # bug regressions (
 NODE_PATH=~/node_modules node tests/features.js              # every user-facing feature, incl. offline
 python3 tests/seo-check.py                                    # crawler view of every page
 cd server && python3 -m unittest test_visits                  # visit counter
+npm install && npm test                                       # CLI + MCP (node:test)
 ```
 
 Both browser and SEO checks also run against production: `TINYSQUISH_URL=https://tinysquish.com/ …`

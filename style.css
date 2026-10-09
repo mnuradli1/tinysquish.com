@@ -981,6 +981,21 @@ input[type="file"], input[type="range"], input[type="number"], select {
   padding: 0.05rem 0.3rem;
 }
 
+.info pre {
+  background: var(--text);
+  color: #f6f5f1;
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  margin: 0.25rem 0 0.75rem;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.info pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+
 .table-wrap {
   overflow-x: auto;
   background: var(--surface);

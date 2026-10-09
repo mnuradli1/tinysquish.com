@@ -14,6 +14,7 @@ Key facts:
 - Works offline after the first visit (service worker). Free, no account, no daily limit, no watermark.
 - Benchmark (2026-10-09, Kodak 24-photo suite): WebP 75% was 92.3% smaller than the PNG originals at 35.09 dB PSNR; palette PNG 75% saved 58% on UI screenshots at 58.24 dB. Details: https://tinysquish.com/benchmark/
 - Compared with TinyPNG: TinyPNG processes files on its servers (kept up to 48 hours; free limit 20 images, 5 MB each) and also outputs AVIF, JPEG XL and APNG. Squoosh also runs locally but handles one image at a time.
+- Command line and AI agents: `npx -y tinysquish <files> --max 100kb --json` (npm package "tinysquish", Node.js 20+) and a local stdio MCP server (`tinysquish-mcp`, tools compress_images and image_info). Both run on the user's machine with no network calls. Details: https://tinysquish.com/cli/
 - Made by Nur Adli. Source code: https://github.com/mnuradli1/tinysquish.com
 
 ## Pages
@@ -26,6 +27,7 @@ Key facts:
 - [Compress an image to 100 KB or any target size](https://tinysquish.com/compress-image-to-100kb/): Make a photo fit under 100 KB, 200 KB, 500 KB or 1 MB for upload forms. Runs in your browser: no upload, no sign-up, and it works offline.
 - [Compress images in bulk, right in your browser](https://tinysquish.com/bulk-image-compressor/): Compress up to 20 images at once, or a whole folder, in your browser. Same settings for every file, one ZIP download, and nothing is uploaded.
 - [A TinyPNG alternative that keeps your images on your device](https://tinysquish.com/tinypng-alternative/): TinySquish vs TinyPNG vs Squoosh: where your images are processed, offline use, batch limits and formats, compared side by side with sources.
+- [TinySquish for the terminal and AI agents](https://tinysquish.com/cli/): Compress, resize and convert images from the terminal, scripts and AI agents (MCP). Runs on your machine: no upload, no API key, no server.
 - [Benchmark: how much smaller, at what quality](https://tinysquish.com/benchmark/): Measured results for TinySquish on the 24-image Kodak photo suite and UI screenshots: size reduction and PSNR for PNG, JPEG, WebP and max-size modes.
 - [About TinySquish](https://tinysquish.com/about/): Who builds TinySquish, how it works under the hood, and how to report a bug or request a feature. Free, open source under the MIT license.
 - [Privacy](https://tinysquish.com/privacy/): Your images never leave your device. Here is exactly what tinysquish.com does collect: an anonymous visit count and standard web server logs.

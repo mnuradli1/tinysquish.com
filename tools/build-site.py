@@ -320,6 +320,77 @@ PAGES = [
         ],
     ),
     dict(
+        path="/cli/", lang="en", app=False, crumb="CLI & MCP", kind="cli",
+        title="TinySquish CLI & MCP Server: Image Compression for Agents",
+        description="Compress, resize and convert images from the terminal, scripts and AI agents (MCP). Runs on your machine: no upload, no API key, no server.",
+        h1="TinySquish for the terminal and AI agents",
+        lead="A command-line tool, an MCP server and an agent skill. All of them run on your own machine.",
+        sections=f"""
+<section aria-labelledby="cli-install">
+  <h2 id="cli-install">Install</h2>
+  <p>You need Node.js 20 or newer. Run it without installing, or install it once to use it offline:</p>
+<pre><code>npx -y tinysquish photo.jpg --max 100kb
+npm install -g tinysquish</code></pre>
+  <p>The package uses <a href="https://sharp.pixelplumbing.com/" rel="noopener">sharp</a> (libvips) and takes about 50 MB on disk. Source code: <a href="{GITHUB}" rel="noopener">GitHub</a>, MIT license.</p>
+</section>
+<section aria-labelledby="cli-use">
+  <h2 id="cli-use">Command line</h2>
+<pre><code># one photo under an upload limit
+tinysquish photo.jpg --max 100kb -f jpeg
+
+# a folder of images for a website, as WebP, into another folder
+tinysquish ./images -f webp -o ./images-web
+
+# lossless PNG, thumbnails, machine-readable output
+tinysquish logo.png -q 95
+tinysquish ./photos --width 400 -f webp -o ./thumbs
+tinysquish ./screenshots --json</code></pre>
+  <p>Inputs are never modified. Results are written as <code>name-compressed.ext</code> next to each input, or into <code>--out</code>. Folders are scanned recursively. Run <code>tinysquish --help</code> for every option.</p>
+</section>
+<section aria-labelledby="cli-mcp">
+  <h2 id="cli-mcp">MCP server for AI agents</h2>
+  <p>The MCP server gives assistants such as Claude, Cursor and other MCP clients two tools: <code>compress_images</code> (files or folders, with quality, format, max size and resize options) and <code>image_info</code>. It runs as a local stdio process and opens no network connections.</p>
+  <p>Claude Code:</p>
+<pre><code>claude mcp add tinysquish -- npx -y -p tinysquish tinysquish-mcp</code></pre>
+  <p>Claude Desktop, Cursor and other clients (<code>mcpServers</code> in their JSON config):</p>
+<pre><code>{{
+  "mcpServers": {{
+    "tinysquish": {{
+      "command": "npx",
+      "args": ["-y", "-p", "tinysquish", "tinysquish-mcp"]
+    }}
+  }}
+}}</code></pre>
+  <p>To limit which folders the agent can read and write, add <code>--allow</code> once per folder, for example <code>"args": ["-y", "-p", "tinysquish", "tinysquish-mcp", "--allow", "/home/me/Pictures"]</code>. Files that link outside those folders are refused too.</p>
+</section>
+<section aria-labelledby="cli-skill">
+  <h2 id="cli-skill">Agent skill</h2>
+  <p>The skill teaches an agent when to reach for TinySquish and how to read its results. For Claude Code, save it as <code>~/.claude/skills/tinysquish/SKILL.md</code>:</p>
+<pre><code>mkdir -p ~/.claude/skills/tinysquish
+curl -fsSL https://raw.githubusercontent.com/mnuradli1/tinysquish.com/main/skill/tinysquish/SKILL.md \
+  -o ~/.claude/skills/tinysquish/SKILL.md</code></pre>
+  <p>It is also included in the npm package under <code>skill/tinysquish/</code>.</p>
+</section>
+<section aria-labelledby="cli-local">
+  <h2 id="cli-local">Runs on your machine</h2>
+  <ul class="facts">
+    <li><strong>No upload, no API key, no account.</strong> Images are read and written on the computer that runs the tool.</li>
+    <li><strong>No server in the loop.</strong> Bots and pipelines can call it as often as they like; nothing is sent to tinysquish.com.</li>
+    <li><strong>Same rules as the web app.</strong> Quality, lossless PNG from 90%, max size and “never larger than the original” behave the same way. The encoders are libvips instead of the browser's, so sizes are similar but not byte-identical.</li>
+  </ul>
+</section>""",
+        faq=[
+            ("Does the TinySquish CLI or MCP server upload my images?",
+             "No. Both run as local programs on your computer and open no network connections. The only download is installing the package from npm."),
+            ("Do I need an API key or an account?",
+             "No. TinySquish is free and open source under the MIT license, with no keys, accounts or usage limits."),
+            ("Is the output the same as on tinysquish.com?",
+             "The rules are the same: quality settings, lossless PNG from 90%, max size and keeping the original when it can't be made smaller. The command-line version encodes with libvips instead of the browser, so file sizes are similar but not byte-identical."),
+            ("Which AI tools can use the MCP server?",
+             "Any client that supports local (stdio) MCP servers, including Claude Code, Claude Desktop and Cursor. Agents without MCP can call the command-line tool with --json instead."),
+        ],
+    ),
+    dict(
         path="/benchmark/", lang="en", app=False, crumb="Benchmark", kind="benchmark",
         title="TinySquish Benchmark: File Size and Quality, Reproduced",
         description="Measured results for TinySquish on the 24-image Kodak photo suite and UI screenshots: size reduction and PSNR for PNG, JPEG, WebP and max-size modes.",
@@ -435,7 +506,7 @@ NAV = {
         ("Tools", [("/compress-png/", "Compress PNG"), ("/compress-jpeg/", "Compress JPEG"), ("/png-to-webp/", "PNG to WebP"),
                    ("/jpg-to-webp/", "JPG to WebP"), ("/compress-image-to-100kb/", "Compress to 100 KB"),
                    ("/bulk-image-compressor/", "Bulk compressor")]),
-        ("TinySquish", [("/benchmark/", "Benchmark"), ("/tinypng-alternative/", "TinyPNG alternative"), ("/about/", "About"),
+        ("TinySquish", [("/cli/", "CLI & MCP"), ("/benchmark/", "Benchmark"), ("/tinypng-alternative/", "TinyPNG alternative"), ("/about/", "About"),
                         ("/privacy/", "Privacy"), (GITHUB, "GitHub"), ("/id/", "Bahasa Indonesia")]),
     ],
     "id": [
@@ -542,6 +613,15 @@ def json_ld(page):
         if page.get("crumb"):
             crumbs.append({"@type": "ListItem", "position": 2, "name": page["crumb"], "item": url})
             graph.append({"@type": "BreadcrumbList", "itemListElement": crumbs})
+    if page.get("kind") == "cli":
+        graph.append({
+            "@type": "SoftwareApplication", "@id": url + "#software", "name": "TinySquish CLI and MCP server",
+            "applicationCategory": "DeveloperApplication", "operatingSystem": "Windows, macOS, Linux (Node.js 20+)",
+            "description": "Command-line tool and MCP server that compress, resize and convert PNG, JPEG and WebP images locally.",
+            "isAccessibleForFree": True, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+            "license": "https://opensource.org/licenses/MIT", "codeRepository": GITHUB,
+            "downloadUrl": "https://www.npmjs.com/package/tinysquish", "author": {"@id": PERSON_ID},
+        })
     if page.get("kind") == "about":
         graph.append({"@type": "Person", "@id": PERSON_ID, "name": "Nur Adli", "url": AUTHOR_GITHUB, "sameAs": [AUTHOR_GITHUB]})
     if page.get("kind") == "benchmark":
@@ -730,6 +810,7 @@ Key facts:
 - Works offline after the first visit (service worker). Free, no account, no daily limit, no watermark.
 - Benchmark ({BENCH['generated']}, Kodak 24-photo suite): WebP 75% was {pct(K['webp-75']['reductionPct'])} smaller than the PNG originals at {K['webp-75']['meanPsnr']:g} dB PSNR; palette PNG 75% saved {pct(U['png-75']['reductionPct'])} on UI screenshots at {U['png-75']['meanPsnr']:g} dB. Details: {SITE}/benchmark/
 - Compared with TinyPNG: TinyPNG processes files on its servers (kept up to 48 hours; free limit 20 images, 5 MB each) and also outputs AVIF, JPEG XL and APNG. Squoosh also runs locally but handles one image at a time.
+- Command line and AI agents: `npx -y tinysquish <files> --max 100kb --json` (npm package "tinysquish", Node.js 20+) and a local stdio MCP server (`tinysquish-mcp`, tools compress_images and image_info). Both run on the user's machine with no network calls. Details: {SITE}/cli/
 - Made by Nur Adli. Source code: {GITHUB}
 
 ## Pages
