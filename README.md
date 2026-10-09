@@ -58,7 +58,8 @@ python3 tools/build-site.py
 ## Tests
 
 ```bash
-NODE_PATH=~/node_modules node tests/browser-regressions.js   # needs playwright + chromium
+NODE_PATH=~/node_modules node tests/browser-regressions.js   # bug regressions (needs playwright + chromium)
+NODE_PATH=~/node_modules node tests/features.js              # every user-facing feature, incl. offline
 python3 tests/seo-check.py                                    # crawler view of every page
 cd server && python3 -m unittest test_visits                  # visit counter
 ```

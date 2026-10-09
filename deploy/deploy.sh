@@ -80,8 +80,10 @@ done
 
 if [ "$RUN_TESTS" = 1 ]; then
   python3 tests/seo-check.py "$SITE_URL" || die "SEO checks failed on live; rollback: $0 --rollback $archive"
-  TINYSQUISH_URL="$SITE_URL" NODE_PATH="${NODE_PATH:-$HOME/node_modules}" node tests/browser-regressions.js \
-    || die "regression tests failed on live; rollback: $0 --rollback $archive"
+  for suite in tests/browser-regressions.js tests/features.js; do
+    TINYSQUISH_URL="$SITE_URL" NODE_PATH="${NODE_PATH:-$HOME/node_modules}" node "$suite" \
+      || die "$suite failed on live; rollback: $0 --rollback $archive"
+  done
 fi
 
 # The visitor counter runs from this repo; restart it so server changes take effect
